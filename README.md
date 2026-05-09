@@ -188,5 +188,5 @@ All rights reserved. The source code, content, and design of sblrent are the exc
 
 ---
 
-**Developed by Niraj Kumar, Saumya Pande**
+
 # sbl-rentservice
