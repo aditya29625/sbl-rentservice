@@ -1,0 +1,22 @@
+{% for booking in bookings %}
+  <div class="card p-3 mb-3">
+    <h5>{{ booking.property.title }} — {{ booking.user.username }}</h5>
+    <p>Status: {{ booking.status }}</p>
+    <p>Dates: {{ booking.start_date }} to {{ booking.end_date }}</p>
+
+    {% if booking.status == 'pending' %}
+      <form method="post" action="{% url 'approve_booking' booking.id %}">
+        {% csrf_token %}
+        <button class="btn btn-success btn-sm">Approve</button>
+      </form>
+      <form method="post" action="{% url 'decline_booking' booking.id %}">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-sm">Decline</button>
+      </form>
+    {% elif booking.status == 'approved' %}
+      <span class="text-success">Approved</span>
+    {% elif booking.status == 'declined' %}
+      <span class="text-danger">Declined</span>
+    {% endif %}
+  </div>
+{% endfor %}

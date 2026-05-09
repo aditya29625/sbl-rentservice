@@ -1,0 +1,97 @@
+<div class="row">
+  {% for property in recent_properties %}
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card h-100 border-0 shadow-sm property-card rounded-4">
+      <div class="position-relative">
+        <img
+          src="{{ property.images.first.image.url|default:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=600' }}"
+          class="card-img-top rounded-top-4"
+          alt="Property Image"
+          style="width: 100%; height: 220px; object-fit: cover"
+        />
+        <span class="badge bg-success badge-featured">Active</span>
+
+        <!-- Wishlist Button -->
+        <button 
+          class="btn {% if property.in_wishlist %}btn-danger{% else %}btn-outline-secondary{% endif %} 
+                 btn-sm position-absolute top-0 end-0 m-2 wishlist-btn"
+          data-id="{{ property.id }}">
+          {% if property.in_wishlist %}
+            <i class="fas fa-heart"></i>
+          {% else %}
+            <i class="far fa-heart"></i>
+          {% endif %}
+        </button>
+
+        <span class="price-tag">₹{{ property.price }}/month</span>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ property.title }}</h5>
+        <p class="card-text text-muted">{{ property.description|truncatewords:15 }}</p>
+        <div class="property-meta mb-3 d-flex justify-content-between">
+          <div class="text-center">
+            <i class="fas fa-bed"></i>
+            <small>{{ property.bedrooms }} Beds</small>
+          </div>
+          <div class="text-center">
+            <i class="fas fa-bath"></i>
+            <small>{{ property.bathrooms }} Baths</small>
+          </div>
+          <div class="text-center">
+            <i class="fas fa-ruler-combined"></i>
+            <small>{{ property.area }} Sqft</small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between">
+          <a href="/property/{{ property.id }}" class="btn btn-outline-primary btn-sm flex-grow-1 me-2">
+            <i class="fas fa-eye me-1"></i> View Details
+          </a>
+          <a href="/book/{{ property.id }}" class="btn btn-outline-primary btn-sm flex-grow-1 book-now-btn">
+            Book Now
+          </a>
+        </div>
+      </div>
+      <div class="card-footer bg-white border-0">
+        <small class="text-muted">
+          <i class="fas fa-map-marker-alt me-1"></i>
+          {% if property.location %}{{ property.location }}{% if property.city or property.state %}, {% endif %}{% endif %}
+{% if property.city %}{{ property.city }}{% if property.state %}, {% endif %}{% endif %}
+{% if property.state %}{{ property.state }}{% endif %}
+        </small>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- AJAX Pagination for featured -->
+<div class="d-flex justify-content-center mt-4">
+  <nav>
+    <ul class="pagination">
+      {% if recent_properties.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page_recent={{ recent_properties.previous_page_number }}">«</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">«</span></li>
+      {% endif %}
+
+      {% for num in recent_properties.paginator.page_range %}
+        {% if recent_properties.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page_recent={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if recent_properties.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page_recent={{ recent_properties.next_page_number }}">»</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">»</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+

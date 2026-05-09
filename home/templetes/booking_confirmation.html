@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation | SBLRent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #334155;
+    }
+    
+    .confirmation-container {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    .confirmation-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      text-align: center;
+    }
+    
+    .confirmation-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .confirmation-header::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .confirmation-header::after {
+      content: "";
+      position: absolute;
+      bottom: -80px;
+      left: -80px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .checkmark-circle {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .checkmark-icon {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+    }
+    
+    .confirmation-body {
+      padding: 3rem 2rem;
+    }
+    
+    .booking-details {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .property-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn-download {
+      background: var(--primary-color);
+      color: white;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-download:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+      color: white;
+    }
+    
+    .confirmation-footer {
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+    }
+    
+    @media (max-width: 768px) {
+      .confirmation-header {
+        padding: 2rem 1.5rem;
+      }
+      
+      .confirmation-body {
+        padding: 2rem 1.5rem;
+      }
+      
+      .booking-details {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  {% include 'navbar.html' %}
+  
+  <div class="confirmation-container">
+    <div class="confirmation-card">
+      <div class="confirmation-header">
+        <div class="checkmark-circle">
+          <i class="fas fa-check checkmark-icon"></i>
+        </div>
+        <h1 class="display-5 fw-bold mb-3">Booking Confirmed!</h1>
+        <p class="lead">Thank you for your reservation. Your booking details are below.</p>
+      </div>
+      
+      <div class="confirmation-body">
+        <h3 class="mb-4">Your Stay at {{ booking.property.title }}</h3>
+        
+        <img src="{{ booking.property.image_url }}" class="property-image" alt="{{ booking.property.title }}">
+        
+        <div class="booking-details">
+          <div class="detail-item">
+            <span class="fw-bold">Confirmation Number:</span>
+            <span>#{{ booking.id }}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="fw-bold">Check-in:</span>
+            <span>{{ booking.start_date|date:"M d, Y" }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">Check-out:</span>
+            <span>{{ booking.end_date|date:"M d, Y" }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">User:</span>
+            <span>{{ booking.user.get_full_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">Email:</span>
+            <span>{{ booking.user.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">Phone:</span>
+            <span>{{ booking.user.phone_number }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">Number of Guests:</span>
+            <span>{{ booking.guest }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="fw-bold">Total Amount:</span>
+            <span class="fw-bold">₹{{ booking.total_price }}</span>
+          </div>
+          {% if booking.special_requests %}
+          <div class="detail-item">
+            <span class="fw-bold">Special Requests:</span>
+            <span>{{ booking.notes }}</span>
+          </div>
+          {% endif %}
+        </div>
+        
+        <p class="text-muted mb-4">
+          <i class="fas fa-info-circle me-2"></i>
+          We've sent the confirmation details to <strong>{{ booking.user.email }}</strong>
+        </p>
+        
+        <div class="d-flex justify-content-center gap-3">
+          <a href="#" class="btn btn-download">
+            <i class="fas fa-download me-2"></i> Download Receipt
+          </a>
+          <a href="/my-bookings" class="btn btn-outline-primary">
+            <i class="fas fa-home me-2"></i> View Property
+          </a>
+        </div>
+      </div>
+      
+      <div class="confirmation-footer">
+        <h5 class="mb-3">What's Next?</h5>
+        <div class="row text-start">
+          <div class="col-md-4 mb-3">
+            <div class="d-flex align-items-start gap-2">
+              <div class="bg-primary bg-opacity-10 p-2 rounded">
+                <i class="fas fa-calendar-check text-primary"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">Prepare for Check-in</h6>
+                <p class="small text-muted mb-0">You'll receive check-in instructions 48 hours before arrival.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="d-flex align-items-start gap-2">
+              <div class="bg-primary bg-opacity-10 p-2 rounded">
+                <i class="fas fa-question-circle text-primary"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">Need Help?</h6>
+                <p class="small text-muted mb-0">Contact our support team anytime.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="d-flex align-items-start gap-2">
+              <div class="bg-primary bg-opacity-10 p-2 rounded">
+                <i class="fas fa-undo text-primary"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">Cancellation Policy</h6>
+                <p class="small text-muted mb-0">Free cancellation until {{ booking.free_cancellation_date|date:"F j, Y" }}.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Print or download receipt
+    document.querySelector('.btn-download').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.print();
+    });
+  </script>
+</body>
+</html>

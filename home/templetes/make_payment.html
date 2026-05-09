@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Make Payment | SBLRent</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f5f7fa; font-family: 'Inter', sans-serif; }
+        .container { max-width: 600px; margin: 4rem auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #4361ee; border: none; }
+        .btn-primary:hover { background-color: #3f37c9; }
+        .payment-summary { border: 1px dashed #ccc; padding: 1rem; border-radius: 8px; background-color: #f8f9fa; }
+        .payment-summary h5 { margin-bottom: 1rem; color: #343a40; }
+        .payment-summary p { margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4"><i class="fas fa-credit-card"></i> Payment Details</h2>
+
+    <div class="payment-summary mb-4">
+        <h5>Booking Summary</h5>
+        <p><strong>Property:</strong> {{ booking.property.title }}</p>
+        <p><strong>Location:</strong> {{ booking.property.address }}</p>
+        <p><strong>Booking duration:</strong> {{ booking.start_date }} to {{ booking.end_date }}</p>
+        <p><strong>Name:</strong> {{ booking.user.get_full_name }}</p>
+        <p><strong>Email:</strong> {{ booking.user.email }}</p>
+        <p><strong>Phone:</strong> {{ booking.user.phone_number }}</p>
+
+        <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+    </div>
+
+    <button id="rzp-button" class="btn btn-primary w-100">Pay ₹{{ booking.total_price }}</button>
+
+    <!-- Hidden form to verify on the server -->
+    <form id="verify-form" action="{% url 'payment_verify' %}" method="post" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+        <input type="hidden" name="month" value="{{ month }}">
+        <input type="hidden" name="year" value="{{ year }}">
+    </form>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  function createAxiosRateLimiter(maxRequests, perMs) {
+    const queue = [];
+    const recent = [];
+
+    function drain() {
+      const now = Date.now();
+      while (recent.length && now - recent[0] >= perMs) {
+        recent.shift();
+      }
+
+      while (queue.length && recent.length < maxRequests) {
+        recent.push(Date.now());
+        const job = queue.shift();
+        axios(job.config).then(job.resolve).catch(job.reject);
+      }
+
+      if (queue.length) {
+        const wait = Math.max(perMs - (Date.now() - recent[0]), 50);
+        setTimeout(drain, wait);
+      }
+    }
+
+    return function limitedAxios(config) {
+      return new Promise((resolve, reject) => {
+        queue.push({ config, resolve, reject });
+        drain();
+      });
+    };
+  }
+
+  const limitedAxios = createAxiosRateLimiter(6, 5000);
+  axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
+  const options = {
+    key: "{{ razorpay_key_id }}",
+    amount: {{ razorpay_amount_paise }},
+    currency: "{{ currency }}",
+    name: "SBLRent",
+    description: `Booking #{{ booking.id }} — {{ month }} {{ year }}`,
+    order_id: "{{ razorpay_order_id }}",
+    prefill: {
+      name: "{{ request.user.get_full_name|default:request.user.username }}",
+      email: "{{ request.user.email }}"
+    },
+    notes: { booking_id: "{{ booking.id }}", month: "{{ month }}", year: "{{ year }}" },
+    handler: function (response) {
+      document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+      document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+      document.getElementById('razorpay_signature').value = response.razorpay_signature;
+      const form = document.getElementById('verify-form');
+      limitedAxios({
+        url: form.action,
+        method: 'POST',
+        data: new FormData(form),
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+        .then(({ data }) => {
+          if (data.ok && data.redirect) {
+            window.location.href = data.redirect;
+            return;
+          }
+          alert(data.error || 'Verification failed');
+        })
+        .catch((error) => {
+          const response = error.response;
+          if (response && response.status === 429) {
+            const retry = response.data?.retry_after;
+            alert(`Too many requests. Please retry in ${retry || 30} seconds.`);
+            return;
+          }
+          alert('Network error during verification');
+        });
+    },
+    theme: { color: '#4361ee' }
+  };
+
+  document.getElementById('rzp-button').onclick = function(e){
+    e.preventDefault();
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+  };
+</script>
+</body>
+</html>

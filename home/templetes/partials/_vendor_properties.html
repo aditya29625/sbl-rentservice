@@ -1,0 +1,89 @@
+{% if properties %}
+<div class="row g-4">
+  {% for property in properties %}
+    <!-- Your property card layout -->
+     <div class="col-md-6 col-lg-6 col-xl-4 property-item" data-status="{{ property.status }}">
+              <div class="property-card">
+                <div class="property-img-container">
+                  <img src="{{ property.images.first.image.url|default:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' }}" 
+                       class="property-img" 
+                       alt="{{ property.title }}">
+                  <div class="property-badge status-{{ property.status }}">
+                    {% if property.status == 'active' %}Active
+                    {% elif property.status == 'pending' %}Pending
+                    {% elif property.status == 'rented' %}Rented
+                    {% else %}Inactive{% endif %}
+                  </div>
+                  <div class="property-actions">
+                    <a href="{% url 'edit_property' property.id %}" class="action-btn edit" data-bs-toggle="tooltip" title="Edit">
+                      <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <a href="{% url 'delete_property' property.id %}" class="action-btn delete" data-bs-toggle="tooltip" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </div>
+                <div class="p-3">
+                  <h5 class="mb-1">{{ property.title|truncatechars:30 }}</h5>
+                  <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-1"></i> {{ property.location|truncatechars:30 }}</p>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-primary">₹{{ property.price }}/mo</span>
+                    <div>
+                      <span class="badge bg-light text-dark me-2"><i class="fas fa-bed me-1"></i> {{ property.bedrooms }}</span>
+                      <span class="badge bg-light text-dark"><i class="fas fa-bath me-1"></i> {{ property.bathrooms }}</span>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted"><i class="far fa-calendar me-1"></i> {{ property.date_added|date:"M d, Y" }}</small>
+                    <div>
+                      <span class="me-2 small"><i class="fas fa-eye me-1"></i> {{ property.views|default:"120" }}</span>
+                      <span class="small"><i class="fas fa-star text-warning me-1"></i> {{ property.rating|default:"4.5" }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  {% endfor %}
+</div>
+
+<div class="d-flex justify-content-center mt-4">
+  <nav aria-label="Property pagination">
+    <ul class="pagination">
+      {% if properties.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ properties.previous_page_number }}">«</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">«</span></li>
+      {% endif %}
+
+      {% for num in properties.paginator.page_range %}
+        {% if properties.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if properties.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ properties.next_page_number }}">»</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">»</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-state-icon">
+    <i class="fas fa-home"></i>
+  </div>
+  <h4 class="mb-3">No Properties Found</h4>
+  <p class="text-muted mb-4">You haven't added any properties yet. Get started by adding your first property listing.</p>
+  <a href="{% url 'add_property' %}" class="btn btn-primary">
+    <i class="fas fa-plus-circle me-2"></i>Add New Property
+  </a>
+</div>
+{% endif %}

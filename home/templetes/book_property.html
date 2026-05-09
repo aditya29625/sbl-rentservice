@@ -1,0 +1,597 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book {{ property.title }} | SBLRent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery-js/2.7.1/css/lightgallery.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #28a745;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f5f7fa;
+    }
+    
+    .booking-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    .booking-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    
+    .property-gallery {
+      height: 100%;
+      position: relative;
+    }
+    
+    .gallery-main {
+      height: 400px;
+      width: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .gallery-main:hover {
+      transform: scale(1.02);
+    }
+    
+    .gallery-thumbnails {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    
+    .thumbnail {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    
+    .thumbnail:hover {
+      transform: scale(1.05);
+    }
+    
+    .video-container {
+      position: relative;
+      margin-top: 16px;
+    }
+    
+    .property-video {
+      width: 100%;
+      border-radius: 8px;
+    }
+    
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: white;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+    
+    .play-button:hover {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .booking-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .booking-body {
+      padding: 2rem;
+    }
+    
+    .property-features {
+      display: flex;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 20px;
+    }
+    
+    .feature-icon {
+      color: var(--primary-color);
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .btn-book {
+      background-color: var(--success-color) !important;
+      background-image: none;
+      color: white;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 8px;
+      width: 100%;
+      transition: all 0.3s ease;
+      display: block;
+      border: none;
+      text-align: center;
+    }
+    
+    .btn-book:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    
+    .price-summary {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .price-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+    
+    .price-total {
+      border-top: 1px solid #eee;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      font-weight: 600;
+    }
+    
+    /* Reusable amenities styles */
+    .amenities-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .amenity-badge {
+      background: #e9ecef;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+    
+    @media (max-width: 768px) {
+      .gallery-main {
+        border-radius: 16px;
+      }
+      
+      .property-gallery {
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  {% include 'navbar.html' %}
+  
+  <div class="booking-container">
+    <div class="booking-card">
+      <div class="booking-header">
+        <h2 class="mb-0">Book Property</h2>
+        <p class="text-muted mb-0">Complete your reservation</p>
+      </div>
+      
+      <div class="row g-0">
+        <div class="col-md-6">
+          <div class="property-gallery p-3">
+            <img src="{{ property.images.first.image.url|default:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' }}" 
+                 class="gallery-main" 
+                 alt="{{ property.title }}"
+                 id="mainImage">
+            
+            <div class="gallery-thumbnails">
+              {% for image in property.images.all %}
+                <img src="{{ image.image.url }}" 
+                     class="thumbnail" 
+                     alt="Property image {{ forloop.counter }}"
+                     onclick="document.getElementById('mainImage').src = this.src">
+             
+              {% endfor %}
+            </div>
+            
+            {% if property.video %}
+            <div class="video-container">
+              <video class="property-video" controls poster="{{ property.video_thumbnail.url }}">
+                <source src="{{ property.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="booking-body">
+            <h3>{{ property.title }}</h3>
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-map-marker-alt text-danger me-2"></i>
+              <span class="text-muted">{{ property.location }}</span>
+            </div>
+            
+            <div class="property-rating mb-3">
+              <span class="badge bg-success">
+                <i class="fas fa-star me-1"></i>
+                {{ property.average_rating|default:"4.5" }}
+              </span>
+              <span class="ms-2 text-muted">({{ property.review_count|default:"24" }} reviews)</span>
+            </div>
+            
+            <p>{{ property.description }}</p>
+            
+            <div class="property-features">
+              <div class="feature">
+                <i class="fas fa-bed feature-icon"></i>
+                <span>{{ property.bedrooms }} Bedrooms</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-bath feature-icon"></i>
+                <span>{{ property.bathrooms }} Bathrooms</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-ruler-combined feature-icon"></i>
+                <span>{{ property.area }} sq.ft</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-home feature-icon"></i>
+                <span>{{ property.property_type }}</span>
+              </div>
+            </div>
+            
+            {% if property.amenities %}
+            <div class="amenities-section">
+              <h5 class="mt-4">Amenities</h5>
+              <div class="amenities-list">
+                {% for amenity in property.amenities %}
+                  <span class="amenity-badge">
+                    <i class="fas fa-check me-1"></i>
+                    {{ amenity }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="" class="mt-4">
+              {% csrf_token %}
+              
+              <h5 class="mb-3">Booking Details</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="checkIn" class="form-label">Check-In Date</label>
+                  <input type="date" class="form-control" id="checkIn" name="start_date" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="checkOut" class="form-label">
+                    Check-Out Date
+                    <i class="fas fa-info-circle text-primary ms-1"
+                       style="cursor:pointer"
+                       id="infoIcon"></i>
+                  </label>
+                  <input type="date" class="form-control" id="checkOut" name="end_date" required>
+                </div>
+                <div class="col-12">
+                  <label for="guests" class="form-label">Number of Guests</label>
+                  <select class="form-select" id="guests" name="guests">
+                    {% for i in "12345"|make_list %}
+                      <option value="{{ forloop.counter }}" {% if forloop.counter == 2 %}selected{% endif %}>{{ forloop.counter }} Guest{% if forloop.counter > 1 %}s{% endif %}</option>
+                    {% endfor %}
+                    <option value="6">5+ Guests</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label for="specialRequests" class="form-label">Special Requests</label>
+                  <textarea class="form-control" id="specialRequests" name="notes" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <h5 class="mb-2">Payment Option</h5>
+                <div id="paymentTypeOptions">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="payment_type" id="payMonthly" value="monthly" checked>
+                    <label class="form-check-label" for="payMonthly">
+                      Pay Monthly (First month now, rest auto-charged)
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="price-summary mt-4">
+                <h5 class="mb-3">Price Summary</h5>
+                <div class="price-item">
+                  <span>₹{{ property.price }} x <span id="nightsCount">0</span></span>
+                  <span>₹<span id="subtotal">0</span></span>
+                </div>
+                <div class="price-item">
+                  <span>Service Fee</span>
+                  <span>₹<span id="serviceFee">0</span></span>
+                </div>
+                <div class="price-item price-total">
+                  <span>Total</span>
+                  <span>₹<span id="totalPrice">0</span></span>
+                </div>
+                <input type="hidden" name="calculated_total_price" id="calculatedTotalPrice" value="0">
+              </div>
+              
+              <button type="submit" class="btn btn-book mt-4">
+                <i class="fas fa-calendar-check me-2"></i> Confirm Booking & Make Payment
+              </button>
+              
+              
+              <div class="text-center mt-3">
+                <small class="text-muted">You won't be charged yet. Free cancellation within 24 hours.</small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="infoModalLabel"><i class="fas fa-info-circle text-primary me-2"></i>Extend Checkout Date</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          You can further extend your checkout date after booking.<br>
+          Just select any date now. You will be able to change it later from your reservation details page.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery-js/2.7.1/js/lightgallery.min.js"></script>
+  <script>
+    // Calculate price based on dates
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+    const nightsCount = document.getElementById('nightsCount');
+    const subtotal = document.getElementById('subtotal');
+    const serviceFee = document.getElementById('serviceFee');
+    const totalPrice = document.getElementById('totalPrice');
+    const dailyRate = {{ property.price }} / 30;
+    
+    // Only monthly payment logic
+    function calculateTotal() {
+      if (checkInInput.value && checkOutInput.value) {
+        const checkInDate = new Date(checkInInput.value);
+        const checkOutDate = new Date(checkOutInput.value);
+        const msInDay = 24 * 60 * 60 * 1000;
+        let fullMonths = 0;
+        let extraDays = 0;
+        const tempDate = new Date(checkInDate);
+
+        while (tempDate <= checkOutDate) {
+          const nextMonth = new Date(tempDate);
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
+          if (nextMonth <= checkOutDate) {
+            fullMonths++;
+            tempDate.setMonth(tempDate.getMonth() + 1);
+          } else {
+            break;
+          }
+        }
+
+        const remainingTime = checkOutDate - tempDate;
+        extraDays = Math.ceil(remainingTime / msInDay);
+
+        if (checkOutDate > checkInDate) {
+        // Always display "First Month" for the payment period
+          nightsCount.textContent = "First Month";
+          const newSubtotal = {{ property.price }};
+          subtotal.textContent = Math.round(newSubtotal);
+          const newServiceFee = Math.round(newSubtotal * 0.01);
+          serviceFee.textContent = newServiceFee;
+          const newTotal = Math.round(newSubtotal + newServiceFee);
+          totalPrice.textContent = newTotal;
+          document.getElementById('calculatedTotalPrice').value = newTotal;
+        }
+      }
+    }
+    
+    // Set minimum dates
+    const today = new Date().toISOString().split('T')[0];
+    checkInInput.min = today;
+checkInInput.addEventListener('change', function() {
+  if (this.value) {
+    const nextDay = new Date(this.value);
+    nextDay.setDate(nextDay.getDate() + 1);
+    checkOutInput.min = nextDay.toISOString().split('T')[0];
+    
+    // If check-out is before new min date, reset it
+    if (checkOutInput.value && new Date(checkOutInput.value) < nextDay) {
+      checkOutInput.value = '';
+    }
+    
+    calculateTotal();
+  } else {
+    checkOutInput.value = '';
+    checkOutInput.min = '';
+    nightsCount.textContent = '0';
+    subtotal.textContent = '0';
+    serviceFee.textContent = '0';
+    totalPrice.textContent = '0';
+  }
+});
+
+checkOutInput.addEventListener('input', function () {
+  if (!this.value) {
+    nightsCount.textContent = '0';
+    subtotal.textContent = '0';
+    serviceFee.textContent = '0';
+    totalPrice.textContent = '0';
+  }
+});
+    
+    checkOutInput.addEventListener('change', calculateTotal);
+    
+    // Initialize date pickers
+    document.addEventListener('DOMContentLoaded', function() {
+      checkInInput.focus();
+      
+      // Initialize light gallery for images
+      document.getElementById('mainImage').addEventListener('click', function() {
+        const images = [
+          {% for image in property.images.all %}
+            { src: '{{ image.image.url }}' },
+          {% empty %}
+            { src: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80' }
+          {% endfor %}
+        ];
+        
+        const dynamicGallery = lightGallery(document.createElement('div'), {
+          dynamic: true,
+          dynamicEl: images,
+          download: false,
+          zoom: true
+        });
+        
+        dynamicGallery.openGallery(0);
+      });
+      
+      // Video play button functionality
+      const video = document.querySelector('.property-video');
+      if (video) {
+        const playButton = document.createElement('i');
+        playButton.className = 'fas fa-play-circle play-button';
+        playButton.style.position = 'absolute';
+        playButton.style.top = '50%';
+        playButton.style.left = '50%';
+        playButton.style.transform = 'translate(-50%, -50%)';
+        playButton.style.fontSize = '48px';
+        playButton.style.color = 'white';
+        playButton.style.opacity = '0.8';
+        playButton.style.cursor = 'pointer';
+        playButton.addEventListener('click', function () {
+          video.play();
+        });
+        video.parentNode.appendChild(playButton);
+
+        // Hide play button on play
+        video.addEventListener('play', function () {
+          playButton.style.display = 'none';
+        });
+
+        // Show play button on pause or ended
+        video.addEventListener('pause', function () {
+          playButton.style.display = 'block';
+        });
+        video.addEventListener('ended', function () {
+          playButton.style.display = 'block';
+        });
+      }
+      
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      
+      // Show modal on hover
+      const infoIcon = document.getElementById('infoIcon');
+      const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+
+      let modalTimeout;
+
+      infoIcon.addEventListener('mouseenter', function() {
+        modalTimeout = setTimeout(() => {
+          infoModal.show();
+        }, 150); // slight delay to avoid accidental triggers
+      });
+
+      infoIcon.addEventListener('mouseleave', function() {
+        clearTimeout(modalTimeout);
+        infoModal.hide();
+      });
+
+      // Optional: Also show modal on click for accessibility
+      infoIcon.addEventListener('click', function() {
+        infoModal.show();
+      });
+    });
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      if (!checkInInput.value || !checkOutInput.value) {
+        e.preventDefault();
+        alert('Please select both check-in and check-out dates');
+        return false;
+      }
+      
+      const checkInDate = new Date(checkInInput.value);
+      const checkOutDate = new Date(checkOutInput.value);
+      
+      if (checkOutDate <= checkInDate) {
+        e.preventDefault();
+        alert('Check-out date must be after check-in date');
+        return false;
+      }
+      
+      return true;
+    });
+    
+    
+  </script>
+</body>
+</html>

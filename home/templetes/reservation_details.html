@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Reservation Management | SBLRent</title>
+    {% load custom_filters %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --success-dark: #38b6db;
+            --danger-color: #f72585;
+            --danger-dark: #e51778;
+            --warning-color: #ffbe0b;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --light-gray: #f1f3f5;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --box-shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .reservation-card {
+            display: flex;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            min-height: 80vh;
+            transition: var(--transition);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .reservation-card:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .property-section,
+        .user-section {
+            padding: 2.5rem;
+            flex: 1;
+        }
+
+        .property-section {
+            border-right: 1px solid #e9ecef;
+            background: linear-gradient(135deg, #f5f7fb 0%, #e4e8f0 100%);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-declined {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .property-image {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow-sm);
+            transition: var(--transition);
+        }
+
+        .property-image:hover {
+            transform: scale(1.01);
+        }
+
+
+        .user-pic {
+            width: 260px;
+            height: 260px;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: var(--box-shadow-sm);
+            margin-bottom: 1.75rem;
+            transition: var(--transition);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .user-pic:hover {
+            transform: scale(1.05);
+        }
+
+        .detail-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        .detail-value i {
+            width: 20px;
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .price-summary {
+            background: white;
+            padding: 1.75rem;
+            border-radius: var(--border-radius-lg);
+
+            box-shadow: var(--box-shadow-sm);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .price-summary h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px dashed #e9ecef;
+        }
+
+        .price-total {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 0.85rem 1.75rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.65rem 1.25rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-approve {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background-color: var(--success-dark);
+            transform: translateY(-3px);
+        }
+
+        .btn-decline {
+            background-color: var(--danger-color);
+            color: white;
+            margin-left: 1rem;
+        }
+
+        .btn-decline:hover {
+            background-color: var(--danger-dark);
+            transform: translateY(-3px);
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.7rem 1.3rem;
+            font-size: 0.95rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn-view:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-pay {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+            padding: 0.85rem 2rem;
+            font-weight: 700;
+        }
+
+        .btn-pay:hover {
+            background-color: #ffaa00;
+            transform: translateY(-3px);
+        }
+
+        .btn:hover {
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+        }
+        .timeline {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -10px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid;
+            background-color: white;
+        }
+
+        .timeline-content {
+            padding: 10px 15px;
+            border-left: 2px solid #ccc;
+            margin-left: 10px;
+        }
+
+        .timeline-date {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notes-box {
+            background: var(--primary-light);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notes-box h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Payment status indicator */
+        .payment-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .payment-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .payment-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Timeline for booking process */
+        .timeline {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10px;
+            height: 100%;
+            width: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary-color);
+        }
+
+        .timeline-content {
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-text {
+            font-size: 0.95rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Reusable amenities styles */
+        .amenities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .amenity-badge {
+            background: hsla(0, 0%, 100%, 1.00);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2.5rem;
+            width: 80%;
+            max-width: 900px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.75rem;
+            font-size: 1.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--gray-color);
+            transition: var(--transition);
+        }
+
+        .close:hover {
+            color: var(--dark-color);
+            transform: rotate(90deg);
+        }
+
+        #aadharPdfViewer {
+            width: 100%;
+            height: 70vh;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+
+            .property-section,
+            .user-section {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .reservation-card {
+                flex-direction: column;
+            }
+
+            .property-section {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .property-image {
+                height: 280px;
+            }
+
+            .action-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .btn-approve,
+            .btn-decline {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .btn-decline {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .property-section,
+            .user-section {
+                padding: 1.75rem;
+            }
+
+
+
+            .modal-content {
+                width: 90%;
+                padding: 1.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            .property-section,
+            .user-section {
+                padding: 1.5rem;
+            }
+
+
+
+            .property-image {
+                height: 220px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+            }
+        }
+        
+
+        .user-section,
+        .property-section,
+        .price-summary,
+        .notes-box,
+        .timeline-content,
+        .modal-content {
+            border-radius: var(--border-radius-lg);
+        }
+    </style>
+</head>
+
+<body>
+    
+      {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+    {% include 'navbar.html' %}
+  
+    <div class="container">
+        <div class="reservation-card">
+            <!-- Left Side - Property Details -->
+            <div class="property-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-home"></i> Property Details
+                    </h2>
+                    <!-- <span class="status-badge status-{{ booking.status }}">{{ booking.status|title }}</span> -->
+                </div>
+                <div style="position: relative; display: inline-block;">
+                    <img src="{{ booking.property.images.first.image.url|default:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=600' }}"
+                         alt="Property Image" class="property-image">
+                    <span style="position: absolute; top: 10px; right: 10px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 1rem; box-shadow: var(--box-shadow-sm);">
+                        ₹{{ booking.property.price }}/mo
+                    </span>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Property Name</span>
+                    <p class="detail-value">{{ booking.property.title }}</p>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Address</span>
+                    <p class="detail-value">
+                        <i class="fas fa-map-marker-alt"></i> {{ booking.property.address }}
+                    </p>
+                </div>
+                <div class="detail-group">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ booking.property.latitude }},{{ booking.property.longitude }}"
+                        target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-map-location-dot me-2"></i> View on Google Maps
+                    </a>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Property Type</span>
+                    <p class="detail-value">
+                        <i class="fas fa-building"></i> {{ booking.property.property_type }}
+                    </p>
+                </div>
+                {% if booking.property.amenities %}
+                <div class="detail-group">
+                    <span class="detail-label">Amenities</span>
+                    <div class="amenities-list mt-2">
+                        {% for amenity in booking.property.amenities %}
+                        <span class="amenity-badge">
+                            <i class="fas fa-check me-1"></i>
+                            {{ amenity }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="detail-group">
+                    <span class="detail-label">Capacity</span>
+                    <p class="detail-value">
+                        <i class="fas fa-bed"></i> {{ booking.property.bedrooms }} Bedrooms •
+                        <i class="fas fa-bath"></i> {{ booking.property.bathrooms }} Bathrooms
+                    </p>
+                </div>
+                {% if request.user.profile.role == 'vendor' %}
+                <!-- Show Guest Info to Vendor -->
+                <div class="user-section" style="border-radius: 16px; overflow: hidden;">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-user-circle"></i> Tenant Information
+                        </h2>
+                    </div>
+                    <img src="{{ booking.user.profile.profile_picture.url }}" alt="User Avatar" class="user-pic">
+                    <div class="detail-group">
+                        <span class="detail-label">Full Name</span>
+                        <p class="detail-value">
+                            <i class="fas fa-user"></i> {{ booking.user.get_full_name }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Email Address</span>
+                        <p class="detail-value">
+                            <i class="fas fa-envelope"></i> {{ booking.user.email }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Phone Number</span>
+                        <p class="detail-value">
+                            <i class="fas fa-phone"></i> {{ booking.user.profile.phone_number }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Aadhar Number</span>
+                        <p class="detail-value">
+                            <i class="fas fa-id-card"></i> {{ booking.user.profile.aadhaar_number }}
+                        </p>
+                        <button class="btn btn-view" id="viewAadharBtn">
+                            <i class="fas fa-file-pdf"></i> View Aadhar PDF
+                        </button>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Booking Dates</span>
+                        <p class="detail-value">
+                            <i class="fas fa-calendar-check"></i> {{ booking.start_date|date:"M d, Y" }} -
+                            {{ booking.end_date|date:"M d, Y" }} ({{ booking_duration }} nights)
+                        </p>
+                    </div>
+                    <div class="notes-box">
+                        <h5>
+                            <i class="fas fa-sticky-note"></i>Tenant Notes
+                        </h5>
+                        <p class="mt-2">"{{ booking.notes }}"</p>
+                    </div>
+                    {% if booking.status == 'pending' %}
+                    <div class="action-buttons">
+                        <button class="btn btn-approve" id="approveBtn">
+                            <i class="fas fa-check-circle"></i> Approve Booking
+                        </button>
+                        <button class="btn btn-decline" id="declineBtn">
+                            <i class="fas fa-times-circle"></i> Decline Booking
+                        </button>
+                    </div>
+                    {% elif booking.status == 'approved' and booking.payment_status == 'pending' %}
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-approve" disabled>
+                            <i class="fas fa-check-circle"></i> Approved - Waiting for Payment
+                        </button>
+                    </div>
+                    {% elif booking.status == 'approved' and booking.payment_status == 'paid' %}
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-approve" disabled>
+                            <i class="fas fa-check-circle"></i> Booking Confirmed
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <!-- Show Vendor Info to User -->
+                <div class="user-section" style="border-radius: 16px; overflow: hidden;">
+                    <div class="section-header">
+                        <h2>
+                            <i class="fas fa-user-circle"></i> Property Owner Information
+                        </h2>
+                    </div>
+                    <img src="{{ booking.property.owner.profile.profile_picture.url }}" alt="Vendor Avatar" class="user-pic">
+                    <div class="detail-group">
+                        <span class="detail-label">Full Name</span>
+                        <p class="detail-value">
+                            <i class="fas fa-user"></i> {{ booking.property.owner.get_full_name }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Email Address</span>
+                        <p class="detail-value">
+                            <i class="fas fa-envelope"></i> {{ booking.property.owner.email }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Phone Number</span>
+                        <p class="detail-value">
+                            <i class="fas fa-phone"></i> {{ booking.property.owner.profile.phone_number }}
+                        </p>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Host Since</span>
+                        <p class="detail-value">
+                            <i class="fas fa-calendar-alt"></i> {{ booking.property.owner.date_joined|date:"M Y" }}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="price-summary">
+                <div class="mb-4 p-3 rounded" style="background: var(--primary-light); border-left: 4px solid var(--primary-color);">
+                    <h5 class="mb-1 text-primary">
+                        <i class="fas fa-calendar-alt"></i> Stay Duration
+                    </h5>
+                    <td data-label="Dates" class="text-center align-middle">
+                        <div class="p-2 rounded" style="background: var(--primary-light); border-left: 4px solid var(--primary-color); display: inline-block;">
+                            <div class="fw-semibold text-primary">
+                                <i class="fas fa-calendar-day"></i> {{ booking.start_date|date:"M d, Y" }}
+                            </div>
+                            <div class="text-muted my-1">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="fw-semibold text-primary">
+                                <i class="fas fa-calendar-check"></i> {{ booking.end_date|date:"M d, Y" }}
+                            </div>
+                          
+                        </div>
+                    </td>
+                </div>
+                {% if request.user == booking.user %}
+                <div class="card mt-4 shadow-sm border-0" style="border-radius: var(--border-radius-lg); overflow: hidden;">
+                    <div class="card-header bg-primary text-white d-flex align-items-center" style="font-weight: 600;">
+                        <i class="fas fa-calendar-plus me-2"></i> Extend Checkout Date
+                    </div>
+                    <div class="card-body bg-light">
+                        <form method="post" action="{% url 'reservation_details' booking.id %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="new_end_date" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-calendar-alt me-1 text-primary"></i> Select New Checkout Date
+                                </label>
+                                <input type="date" name="new_end_date" id="new_end_date" class="form-control border-primary"
+                                       min="{{ booking.end_date }}" required>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save me-2"></i> Extend Stay
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <h4>
+                    <i class="fas fa-receipt"></i> Payment Summary
+                </h4>
+
+                <!-- Year Selector -->
+                <div class="mb-3">
+                    <label for="yearSelect" class="form-label">Select Year</label>
+                    <select id="yearSelect" class="form-select" onchange="filterPaymentsByYear(this.value)">
+                        {% with start=booking.start_date.year end=booking.end_date.year %}
+                            {% for year in start|get_range:end %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        {% endwith %}
+                    </select>
+                </div>
+
+                <!-- Timeline View -->
+                <div class="timeline">
+                    {% for payment in monthly_payments %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot d-flex justify-content-center align-items-center"
+                             style="border-color: {% if payment.status == 'paid' %}#28a745{% else %}#dc3545{% endif %}; color: {% if payment.status == 'paid' %}#28a745{% else %}#dc3545{% endif %}; font-size: 12px;">
+                            {% if payment.status == 'paid' %}
+                            <i class="fas fa-check"></i>
+                            {% else %}
+                            <i class="fas fa-times"></i>
+                            {% endif %}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-date">
+                                <span class="fw-bold text-primary">{{ payment.month }} {{ payment.year }}</span>
+                                <span class="badge bg-light text-dark ms-2">
+                                    Period: {{ payment.period_start|date:"M d, Y" }} 
+                                    {% if payment.period_end %}
+                                        &ndash; {{ payment.period_end|date:"M d, Y" }}
+                                    {% endif %}
+                                </span>
+                                {% if payment.status == 'paid' %}
+                                    <span class="badge bg-success ms-2">
+                                        <i class="fas fa-check-circle"></i> Paid on {{ payment.date|date:"M d, Y" }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark ms-2">
+                                        <i class="fas fa-clock"></i> Due for payment
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="timeline-text">
+                                {% if payment.status == 'paid' %}
+                                <i class="fas fa-check-circle text-success"></i> Payment received
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i> Payment missing
+                                {% if request.user.profile.role == 'user' %}
+                                <a href="{% url 'book_property' booking.property.id %}?month={{ payment.month }}&year={{ payment.year }}" class="btn btn-sm btn-warning ms-2">Pay Now</a>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Monthly Details View -->
+                <div class="mt-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-file-invoice-dollar"></i> Monthly Payment Details
+                    </h5>
+                    <ul class="list-group">
+                        {% for payment in monthly_payments %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ payment.month }} - ₹{{ payment.amount }}</span>
+                            <span class="badge bg-{% if payment.status == 'paid' %}success{% else %}danger{% endif %}">
+                                {% if payment.status == 'paid' %}
+                                <i class="fas fa-check-circle"></i> Paid
+                                {% else %}
+                                <i class="fas fa-times-circle"></i> Not Paid
+                                {% endif %}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="price-item">
+                    <span>Base Price  per Month </span>
+                    <span>₹{{ booking.property.price}}</span>
+                </div>
+                <div class="price-item">
+                    <span>Service Fee</span>
+                    <span>₹{{ service_fee }}</span>
+                </div>
+                <div class="price-item">
+                    <span>Taxes</span>
+                    <span>₹{{ tax_amount }}</span>
+                </div>
+                <div class="price-total">
+                    <span>Total Amount</span>
+                    <span>₹{{ total_amount }}</span>
+                </div>
+                {% if booking.status == 'approved' and booking.payment_status != 'paid' %}
+                <div class="action-buttons" style="justify-content: flex-start;">
+                    <a href="{% url 'book_property' booking.property.id %}" class="btn btn-pay">
+                        <i class="fas fa-credit-card"></i> Complete Payment Now
+                    </a>
+                </div>
+                {% elif booking.status == 'approved' and booking.payment_status == 'paid' %}
+                <div class="action-buttons" style="justify-content: flex-start;">
+                    <button class="btn btn-approve" disabled>
+                        <i class="fas fa-check-circle"></i> Payment Completed
+                    </button>
+                </div>
+                {% endif %}
+                {% if booking.payment_status %}
+                <div class="mt-3">
+                    <span class="payment-status payment-{{ booking.payment_status }}">
+                        {% if booking.payment_status == 'paid' %}
+                        <i class="fas fa-check-circle"></i>
+                        {% else %}
+                        <i class="fas fa-clock"></i>
+                        {% endif %}
+                        Payment {{ booking.payment_status|title }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Aadhar PDF Modal -->
+    <div id="aadharModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>
+                <i class="fas fa-id-card"></i> Aadhar Verification Document
+            </h3>
+            <p class="mb-3">Tenant: {{ booking.user.get_full_name }} | Aadhar: {{ booking.user.profile.aadhaar_number }}
+            </p>
+            {% comment %} <iframe id="aadharPdfViewer" src="{{ booking.user.profile.aadhaar_document.url }}"></iframe>
+            {% endcomment %}
+        </div>
+    </div>
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeConfirmModal()">&times;</span>
+            <h3 id="confirmModalTitle">
+                <i class="fas fa-check-circle"></i> Confirm Action
+            </h3>
+            <div id="confirmModalContent" class="my-3">Are you sure you want to proceed with this action?</div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-light" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Modal functionality
+        const modal = document.getElementById("aadharModal");
+        const btn = document.getElementById("viewAadharBtn");
+        const span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function () {
+            modal.style.display = "block";
+            document.body.style.overflow = 'hidden';
+        }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Confirmation Modal
+        const confirmModal = document.getElementById("confirmModal");
+
+        function showConfirmModal(title, content, confirmCallback) {
+            document.getElementById("confirmModalTitle").innerHTML = title;
+            document.getElementById("confirmModalContent").innerHTML = content;
+            document.getElementById("confirmActionBtn").onclick = confirmCallback;
+            confirmModal.style.display = "block";
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmModal() {
+            confirmModal.style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+
+        // Approve/Decline buttons functionality
+        document.getElementById('approveBtn')?.addEventListener('click', function () {
+            showConfirmModal(
+                '<i class="fas fa-check-circle"></i> Approve Booking',
+                'Are you sure you want to approve this booking request? The guest will be notified and asked to complete payment.',
+                function () {
+                    // AJAX call to approve booking
+                    fetch('/api/bookings/{{ booking.id }}/approve/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showAlert('success', 'Booking approved successfully! Payment link has been sent to the guest.');
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                showAlert('error', 'Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showAlert('error', 'An error occurred while approving the booking.');
+                        })
+                        .finally(() => closeConfirmModal());
+                }
+            );
+        });
+
+        document.getElementById('declineBtn')?.addEventListener('click', function () {
+            showConfirmModal(
+                '<i class="fas fa-times-circle"></i> Decline Booking',
+                '<div class="mb-3">Please specify reason for declining this booking:</div>' +
+                '<textarea id="declineReason" class="form-control" rows="3" placeholder="Enter reason for declining..."></textarea>',
+                function () {
+                    const reason = document.getElementById('declineReason').value;
+                    if (!reason) {
+                        alert('Please provide a reason for declining the booking.');
+                        return;
+                    }
+
+                    // AJAX call to decline booking
+                    fetch('/api/bookings/{{ booking.id }}/decline/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason: reason })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showAlert('success', 'Booking declined successfully. The guest has been notified.');
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                showAlert('error', 'Error: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showAlert('error', 'An error occurred while declining the booking.');
+                        })
+                        .finally(() => closeConfirmModal());
+                }
+            );
+        });
+
+        // Show alert message
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} fixed-top mx-auto mt-3`;
+            alertDiv.style.maxWidth = '500px';
+            alertDiv.style.zIndex = '1050';
+            alertDiv.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            alertDiv.innerHTML = message;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
+        // Year filter for payment summary
+        function filterPaymentsByYear(year) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('year', year);
+            window.location.href = url.toString();
+        }
+    </script>
+</body>
+
+</html>

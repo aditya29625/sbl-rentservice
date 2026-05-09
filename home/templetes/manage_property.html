@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if property %}Edit{% else %}Add{% endif %} Property</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .property-form-container {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      padding: 2rem 0;
+    }
+    .property-form {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #4361ee;
+    }
+    .form-section {
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .form-section h5 {
+      color: #4361ee;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 0.5rem;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+    }
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ced4da;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #4361ee;
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+    .btn-primary {
+      background-color: #4361ee;
+      border-color: #4361ee;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    .btn-primary:hover {
+      background-color: #3a56d4;
+      border-color: #3a56d4;
+    }
+    .image-preview {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border: 1px dashed #ced4da;
+      display: none;
+    }
+    .amenities-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .amenity-tag {
+      background-color: #e9ecef;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+    }
+    .amenity-tag-remove {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      color: #6c757d;
+    }
+    .amenity-tag-remove:hover {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  {% include 'navbar.html' %}
+  
+  <div class="property-form-container">
+    <div class="property-form">
+      <div class="form-header">
+        <h2><i class="bi bi-house-add"></i> {% if property %}Edit{% else %}Add New{% endif %} Property</h2>
+        <p class="text-muted">Fill in the details below to {% if property %}update{% else %}list{% endif %} your property</p>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h5><i class="bi bi-info-circle"></i> Basic Information</h5>
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">Property Title</label>
+            <input type="text" class="form-control" id="title" name="title" 
+                   value="{{ property.title|default:'' }}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" 
+                      rows="4" required>{{ property.description|default:'' }}</textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="property_type" class="form-label">Property Type</label>
+              <select class="form-select" id="property_type" name="property_type" required>
+                <option value="house" {% if property.property_type == 'house' %}selected{% endif %}>House</option>
+                <option value="apartment" {% if property.property_type == 'apartment' %}selected{% endif %}>Apartment</option>
+                <option value="condo" {% if property.property_type == 'condo' %}selected{% endif %}>Condo</option>
+                <option value="land" {% if property.property_type == 'land' %}selected{% endif %}>Land</option>
+                <option value="commercial" {% if property.property_type == 'commercial' %}selected{% endif %}>Commercial</option>
+                <option value="other" {% if property.property_type == 'other' %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="status" class="form-label">Status</label>
+              <select class="form-select" id="status" name="status" required>
+                <option value="active" {% if property.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="pending" {% if property.status == 'pending' %}selected{% endif %}>Pending Approval</option>
+                <option value="rented" {% if property.status == 'rented' %}selected{% endif %}>Rented</option>
+                <option value="sold" {% if property.status == 'sold' %}selected{% endif %}>Sold</option>
+                <option value="draft" {% if property.status == 'draft' %}selected{% endif %}>Draft</option>
+                <option value="inactive" {% if property.status == 'inactive' %}selected{% endif %}>Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Location Information Section -->
+        <div class="form-section">
+          <h5><i class="bi bi-geo-alt"></i> Location Information</h5>
+          
+          <div class="mb-3">
+            <label for="location" class="form-label">Location Name</label>
+            <input type="text" class="form-control" id="location" name="location" 
+                   value="{{ property.location|default:'' }}" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="address" class="form-label">Full Address</label>
+            <input type="text" class="form-control" id="address" name="address" 
+                   value="{{ property.address|default:'' }}">
+          </div>
+          
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="city" class="form-label">City</label>
+              <input type="text" class="form-control" id="city" name="city" 
+                     value="{{ property.city|default:'' }}">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label for="state" class="form-label">State</label>
+              <input type="text" class="form-control" id="state" name="state" 
+                     value="{{ property.state|default:'' }}">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label for="zip_code" class="form-label">ZIP Code</label>
+              <input type="text" class="form-control" id="zip_code" name="zip_code" 
+                     value="{{ property.zip_code|default:'' }}">
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-md-6 mb-3">
+              <label for="latitude" class="form-label">Latitude</label>
+              <input type="text" class="form-control" id="latitude" name="latitude" value="{{ property.latitude|default:'' }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="longitude" class="form-label">Longitude</label>
+              <input type="text" class="form-control" id="longitude" name="longitude" value="{{ property.longitude|default:'' }}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary" onclick="openMapModal()">Pick Location on Map</button>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="mapModalLabel">Select Property Location</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 400px; position: relative;">
+                  <input type="text" id="map-search" class="form-control mb-2" placeholder="Search for a location..." autocomplete="off">
+                  <ul id="map-suggestions" class="list-group position-absolute bg-white border rounded shadow" style="top: 45px; left: 0; right: 0; z-index: 9999; max-height: 250px; overflow-y: auto; display: none;"></ul>
+                  <div id="map" style="height: 100%; width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pricing Information Section -->
+        <div class="form-section">
+          <h5><i class="bi bi-cash-stack"></i> Pricing Information</h5>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="price" class="form-label">Price (₹)</label>
+              <input type="number" step="0.01" class="form-control" id="price" name="price" 
+                     value="{{ property.price|default:'' }}" required>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="deposit" class="form-label">Security Deposit (₹)</label>
+              <input type="number" step="0.01" class="form-control" id="deposit" name="deposit" 
+                     value="{{ property.deposit|default:'' }}">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Property Details Section -->
+        <div class="form-section">
+          <h5><i class="bi bi-house-door"></i> Property Details</h5>
+          
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="bedrooms" class="form-label">Bedrooms</label>
+              <input type="number" class="form-control" id="bedrooms" name="bedrooms" 
+                     value="{{ property.bedrooms|default:'1' }}" min="0">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label for="bathrooms" class="form-label">Bathrooms</label>
+              <input type="number"  class="form-control" id="bathrooms" name="bathrooms" 
+                     value="{{ property.bathrooms|default:'1' }}" min="0">
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label for="area" class="form-label">Area (sq ft)</label>
+              <input type="number" class="form-control" id="area" name="area" 
+                     value="{{ property.area|default:'' }}" min="0">
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="year_built" class="form-label">Year Built</label>
+            <input type="number" class="form-control" id="year_built" name="year_built" 
+                   value="{{ property.year_built|default:'' }}" min="1800" max="{% now 'Y' %}">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Amenities</label>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="amenity_input" placeholder="Add amenity (e.g., parking, pool)">
+              <button class="btn btn-outline-secondary" type="button" id="add_amenity">
+                <i class="bi bi-plus"></i> Add
+              </button>
+            </div>
+            <div class="amenities-tags" id="amenities_tags">
+              <!-- Amenity tags will be added here by JavaScript -->
+            </div>
+            <script id="amenities-data" type="application/json">
+              {{ amenities_json|safe }}
+            </script>
+            <input type="hidden" name="amenities" id="amenities" value="">
+          </div>
+        </div>
+        
+        <!-- Media Section -->
+        <div class="form-section">
+          <h5><i class="bi bi-images"></i> Media</h5>
+          
+          <!-- <div class="mb-3">
+            <label for="image_url" class="form-label">Main Image URL</label>
+            <input type="url" class="form-control" id="image_url" name="image_url" 
+                   value="{{ property.image_url|default:'' }}" onchange="updateImagePreview(this.value)">
+            <img id="image_preview" class="image-preview" src="{{ property.image_url|default:'' }}" 
+                 alt="Property image preview" onerror="this.style.display='none'">
+          </div> -->
+          
+          <div class="mb-3">
+            <label for="image_upload" class="form-label">Upload Images</label>
+            <p class="text-muted">Multiple image upload with preview and remove option</p>
+            <!-- Existing images from database -->
+            {% if property and property.images.all %}
+            <div class="mb-2">
+              <label class="form-label">Existing Images</label>
+              <div id="existing_images" class="d-flex flex-wrap gap-2">
+                {% for image in property.images.all %}
+                  <div class="position-relative me-2 mb-2" style="display:inline-block;">
+                    <img src="{{ image.image.url }}" alt="Property image" class="rounded border" style="width:90px;height:90px;object-fit:cover;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" style="border-radius:50%;padding:0 6px 2px 6px;line-height:1;" onclick="removeExistingImage('{{ image.id }}', this)">&times;</button>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            <input type="file" class="form-control" id="image_upload" name="image_upload" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple>
+            <div id="multi_image_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="video_upload" class="form-label">Upload Property Video</label>
+            {% if property and property.video %}
+            <div class="mb-3 d-flex ">
+              <div class="card shadow-sm p-2" style="max-width: 320px; background: #f8f9fa; border-radius: 12px; position: relative;">
+                <label class="form-label mb-2 text-center w-100" style="color: #4361ee; font-weight: 600;">Existing Video</label>
+                <div class="position-relative w-100 d-flex justify-content-center align-items-center" style="min-height: 180px;">
+                  <video src="{{ property.video.url }}" controls style="width: 100%; max-width: 280px; height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #ced4da; background: #000;"></video>
+                  <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" style="border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" onclick="removeExistingVideo(this)" title="Remove Video">&times;</button>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+                    <input type="file" class="form-control" id="video_upload" name="video" accept=".mp4,.mov,.avi,video/mp4,video/quicktime,video/x-msvideo,video/avi,application/x-troff-msvideo">
+                <div id="video_preview_container" class="mt-2"></div>
+          </div>
+                  <div id="propertyUploadWarning" class="alert alert-warning d-none" role="alert"></div>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-save"></i> {% if property %}Update{% else %}Add{% endif %} Property
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <script>
+    const propertyUploadWarning = document.getElementById('propertyUploadWarning');
+
+    function showPropertyUploadWarning(message) {
+      if (!propertyUploadWarning) return;
+      propertyUploadWarning.textContent = message;
+      propertyUploadWarning.classList.remove('d-none');
+      alert(message);
+    }
+
+    function clearPropertyUploadWarning() {
+      if (!propertyUploadWarning) return;
+      propertyUploadWarning.textContent = '';
+      propertyUploadWarning.classList.add('d-none');
+    }
+
+    function getFileExtension(fileName) {
+      return (fileName.split('.').pop() || '').toLowerCase();
+    }
+
+    function isValidImageFile(file) {
+      const ext = getFileExtension(file.name);
+      return ['jpg', 'jpeg', 'png'].includes(ext) && ['image/jpeg', 'image/png'].includes(file.type);
+    }
+
+    function isValidVideoFile(file) {
+      const ext = getFileExtension(file.name);
+      const allowedExt = ['mp4', 'mov', 'avi'];
+      const allowedMime = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/avi', 'application/x-troff-msvideo'];
+      return allowedExt.includes(ext) && allowedMime.includes(file.type);
+    }
+
+    function createAxiosRateLimiter(maxRequests, perMs) {
+      const queue = [];
+      const recent = [];
+
+      function drain() {
+        const now = Date.now();
+        while (recent.length && now - recent[0] >= perMs) {
+          recent.shift();
+        }
+
+        while (queue.length && recent.length < maxRequests) {
+          recent.push(Date.now());
+          const job = queue.shift();
+          axios(job.config).then(job.resolve).catch(job.reject);
+        }
+
+        if (queue.length) {
+          const wait = Math.max(perMs - (Date.now() - recent[0]), 50);
+          setTimeout(drain, wait);
+        }
+      }
+
+      return function limitedAxios(config) {
+        return new Promise((resolve, reject) => {
+          queue.push({ config, resolve, reject });
+          drain();
+        });
+      };
+    }
+
+    const limitedAxios = createAxiosRateLimiter(10, 5000);
+    axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
+    function getCsrfToken() {
+      const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+      return tokenInput ? tokenInput.value : '';
+    }
+
+    // Video preview and remove for new upload
+    document.addEventListener('DOMContentLoaded', function() {
+      const videoInput = document.getElementById('video_upload');
+      const videoPreviewContainer = document.getElementById('video_preview_container');
+      let selectedVideoFile = null;
+
+      function updateVideoPreview() {
+        videoPreviewContainer.innerHTML = '';
+        if (selectedVideoFile) {
+          const url = URL.createObjectURL(selectedVideoFile);
+          const wrapper = document.createElement('div');
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block';
+          wrapper.style.maxWidth = '280px';
+          wrapper.style.marginBottom = '8px';
+
+          const video = document.createElement('video');
+          video.src = url;
+          video.controls = true;
+          video.style.width = '100%';
+          video.style.maxWidth = '280px';
+          video.style.height = '180px';
+          video.style.objectFit = 'cover';
+          video.style.borderRadius = '8px';
+          video.style.border = '1px solid #ced4da';
+          video.style.background = '#000';
+
+          // Cross button
+          const cross = document.createElement('span');
+          cross.innerHTML = '&times;';
+          cross.style.position = 'absolute';
+          cross.style.top = '2px';
+          cross.style.right = '6px';
+          cross.style.background = 'rgba(255,255,255,0.8)';
+          cross.style.borderRadius = '50%';
+          cross.style.cursor = 'pointer';
+          cross.style.fontSize = '20px';
+          cross.style.color = '#dc3545';
+          cross.style.width = '28px';
+          cross.style.height = '28px';
+          cross.style.display = 'flex';
+          cross.style.alignItems = 'center';
+          cross.style.justifyContent = 'center';
+          cross.title = 'Remove';
+          cross.onclick = function() {
+            selectedVideoFile = null;
+            videoInput.value = '';
+            updateVideoPreview();
+          };
+
+          wrapper.appendChild(video);
+          wrapper.appendChild(cross);
+          videoPreviewContainer.appendChild(wrapper);
+        }
+      }
+
+      if (videoInput) {
+        videoInput.addEventListener('change', function() {
+          clearPropertyUploadWarning();
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+
+            if (!isValidVideoFile(file)) {
+              this.value = '';
+              selectedVideoFile = null;
+              updateVideoPreview();
+              showPropertyUploadWarning('Invalid video file. Only MP4, MOV, AVI are allowed. SVG and other formats are blocked.');
+              return;
+            }
+
+            if (file.size > 100 * 1024 * 1024) {
+              this.value = '';
+              selectedVideoFile = null;
+              updateVideoPreview();
+              showPropertyUploadWarning('Video exceeds 100MB limit.');
+              return;
+            }
+
+            selectedVideoFile = file;
+          } else {
+            selectedVideoFile = null;
+          }
+          updateVideoPreview();
+        });
+      }
+    });
+    // Remove existing video (AJAX or form submission)
+    function removeExistingVideo(btn) {
+      if (!confirm('Are you sure you want to remove this video?')) return;
+      limitedAxios({
+        url: `/remove-property-video/{{ property.id }}/`,
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCsrfToken()
+        }
+      })
+      .then(() => {
+        btn.parentElement.remove();
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 429) {
+          const retry = error.response.data?.retry_after;
+          alert(`Too many requests. Please retry in ${retry || 30} seconds.`);
+          return;
+        }
+        alert('Failed to remove video.');
+      });
+      // Option 2: If you want to use a hidden form, you can submit it here instead
+    }
+    // Remove existing image (AJAX or form submission)
+    function removeExistingImage(imageId, btn) {
+      if (!confirm('Are you sure you want to remove this image?')) return;
+      limitedAxios({
+        url: `/remove-property-image/${imageId}/`,
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCsrfToken()
+        }
+      })
+      .then(() => {
+        btn.parentElement.remove();
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 429) {
+          const retry = error.response.data?.retry_after;
+          alert(`Too many requests. Please retry in ${retry || 30} seconds.`);
+          return;
+        }
+        alert('Failed to remove image.');
+      });
+      // Option 2: If you want to use a hidden form, you can submit it here instead
+    }
+    // Multi-image preview for file input with remove option
+    document.addEventListener('DOMContentLoaded', function() {
+      const imageInput = document.getElementById('image_upload');
+      const previewContainer = document.getElementById('multi_image_preview');
+      let selectedFiles = [];
+
+      function updatePreview() {
+        previewContainer.innerHTML = '';
+        selectedFiles.forEach((file, idx) => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            wrapper.style.display = 'inline-block';
+            wrapper.style.marginRight = '8px';
+            wrapper.style.marginBottom = '8px';
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'rounded border';
+            img.style.width = '90px';
+            img.style.height = '90px';
+            img.style.objectFit = 'cover';
+
+            // Cross button
+            const cross = document.createElement('span');
+            cross.innerHTML = '&times;';
+            cross.style.position = 'absolute';
+            cross.style.top = '2px';
+            cross.style.right = '6px';
+            cross.style.background = 'rgba(255,255,255,0.8)';
+            cross.style.borderRadius = '50%';
+            cross.style.cursor = 'pointer';
+            cross.style.fontSize = '20px';
+            cross.style.color = '#dc3545';
+            cross.style.width = '22px';
+            cross.style.height = '22px';
+            cross.style.display = 'flex';
+            cross.style.alignItems = 'center';
+            cross.style.justifyContent = 'center';
+            cross.title = 'Remove';
+            cross.onclick = function() {
+              selectedFiles.splice(idx, 1);
+              updatePreview();
+              updateInputFiles();
+            };
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(cross);
+            previewContainer.appendChild(wrapper);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function updateInputFiles() {
+        // Create a new DataTransfer to update the input's files
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        imageInput.files = dt.files;
+      }
+
+      if (imageInput) {
+        imageInput.addEventListener('change', function() {
+          clearPropertyUploadWarning();
+          // Append new files to selectedFiles, avoiding duplicates
+          const newFiles = Array.from(this.files);
+          // Only add files that are not already in selectedFiles (by name and size)
+          newFiles.forEach(newFile => {
+            if (!isValidImageFile(newFile)) {
+              showPropertyUploadWarning('One or more files are invalid. Only JPG/JPEG/PNG images are allowed. SVG is blocked.');
+              return;
+            }
+
+            if (newFile.size > 10 * 1024 * 1024) {
+              showPropertyUploadWarning('One or more images exceed 10MB limit.');
+              return;
+            }
+
+            if (!selectedFiles.some(f => f.name === newFile.name && f.size === newFile.size && f.lastModified === newFile.lastModified)) {
+              selectedFiles.push(newFile);
+            }
+          });
+          updatePreview();
+          updateInputFiles();
+        });
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form[enctype="multipart/form-data"]');
+      const imageInput = document.getElementById('image_upload');
+      const videoInput = document.getElementById('video_upload');
+
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        clearPropertyUploadWarning();
+
+        const imageFiles = imageInput ? Array.from(imageInput.files || []) : [];
+        for (const file of imageFiles) {
+          if (!isValidImageFile(file)) {
+            e.preventDefault();
+            showPropertyUploadWarning('Invalid image file selected. Only JPG/JPEG/PNG are allowed. SVG is blocked.');
+            return;
+          }
+          if (file.size > 10 * 1024 * 1024) {
+            e.preventDefault();
+            showPropertyUploadWarning('Image file exceeds 10MB limit.');
+            return;
+          }
+        }
+
+        const videoFile = videoInput && videoInput.files ? videoInput.files[0] : null;
+        if (videoFile) {
+          if (!isValidVideoFile(videoFile)) {
+            e.preventDefault();
+            showPropertyUploadWarning('Invalid video file selected. Only MP4/MOV/AVI are allowed.');
+            return;
+          }
+          if (videoFile.size > 100 * 1024 * 1024) {
+            e.preventDefault();
+            showPropertyUploadWarning('Video file exceeds 100MB limit.');
+            return;
+          }
+        }
+      });
+    });
+    // Update image preview when URL changes
+    function updateImagePreview(url) {
+      const preview = document.getElementById('image_preview');
+      if (url) {
+        preview.src = url;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+    
+    // Show image preview if there's a default image
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   const defaultImage = "{{ property.image_url|default:'' }}";
+    //   if (defaultImage) {
+    //     updateImagePreview(defaultImage);
+    //   }
+      
+    //   // Initialize amenities tags
+    //   // const amenities = JSON.parse(document.getElementById('amenities').value || '[]');
+    //   // amenities.forEach(amenity => {
+    //   //   addAmenityTag(amenity);
+    //   // });
+    // });
+    // --------
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Amenities initialization
+      const tagsContainer = document.getElementById('amenities_tags');
+      const amenitiesInput = document.getElementById('amenities');
+      let amenities = [];
+      try {
+        amenities = JSON.parse(document.getElementById('amenities-data').textContent || '[]');
+      } catch {
+        amenities = [];
+      }
+      renderAmenities();
+
+      document.getElementById('add_amenity').addEventListener('click', function() {
+        const input = document.getElementById('amenity_input');
+        const name = input.value.trim();
+        if (name && !amenities.includes(name)) {
+          amenities.push(name);
+          input.value = '';
+          renderAmenities();
+        }
+      });
+
+      function renderAmenities() {
+        tagsContainer.innerHTML = '';
+        amenities.forEach((amenity, idx) => {
+          const tag = document.createElement('div');
+          tag.className = 'amenity-tag';
+          tag.innerHTML = `
+            <span>${amenity}</span>
+            <span class="amenity-tag-remove" style="margin-left:8px;cursor:pointer;" onclick="removeAmenityTag(${idx})">
+              <i class="bi bi-x"></i>
+            </span>
+          `;
+          tagsContainer.appendChild(tag);
+        });
+        updateAmenitiesInput();
+      }
+
+      window.removeAmenityTag = function(idx) {
+        amenities.splice(idx, 1);
+        renderAmenities();
+      };
+
+      function updateAmenitiesInput() {
+        amenitiesInput.value = JSON.stringify(amenities);
+      }
+    });
+
+
+
+
+
+
+
+
+
+
+    // ----------
+    // Amenities management
+    // document.getElementById('add_amenity').addEventListener('click', function() {
+    //   const input = document.getElementById('amenity_input');
+    //   if (input.value.trim()) {
+    //     addAmenityTag(input.value.trim());
+    //     input.value = '';
+    //   }
+    // });
+    
+    // function addAmenityTag(amenity) {
+    //   const tagsContainer = document.getElementById('amenities_tags');
+    //   const tag = document.createElement('div');
+    //   tag.className = 'amenity-tag';
+    //   tag.innerHTML = `
+    //     ${amenity}
+    //     <span class="amenity-tag-remove" onclick="removeAmenityTag(this)">
+    //       <i class="bi bi-x"></i>
+    //     </span>
+    //   `;
+    //   tagsContainer.appendChild(tag);
+    //   updateAmenitiesInput();
+    // }
+    
+    // function removeAmenityTag(element) {
+    //   element.parentElement.remove();
+    //   updateAmenitiesInput();
+    // }
+    
+    // function updateAmenitiesInput() {
+    //   const tags = Array.from(document.querySelectorAll('.amenity-tag'))
+    //     .map(tag => tag.textContent.trim().replace('×', '').trim());
+    //   document.getElementById('amenities').value = JSON.stringify(tags);
+    // }
+
+    function openMapModal() {
+      const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+      modal.show();
+
+      setTimeout(() => {
+        const lat = parseFloat(document.getElementById('latitude').value) || 20.5937;
+        const lng = parseFloat(document.getElementById('longitude').value) || 78.9629;
+
+        if (window._map) {
+          window._map.remove();
+        }
+
+        window._map = L.map('map').setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(window._map);
+
+        window._marker = L.marker([lat, lng], { draggable: true }).addTo(window._map);
+        window._marker.on('dragend', function(e) {
+          const { lat, lng } = window._marker.getLatLng();
+          document.getElementById('latitude').value = lat.toFixed(6);
+          document.getElementById('longitude').value = lng.toFixed(6);
+        });
+
+        window._map.on('click', function(e) {
+          window._marker.setLatLng(e.latlng);
+          document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+          document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+        });
+      }, 300);
+    }
+
+    // Location search suggestions for map modal
+    const searchInput = document.getElementById('map-search');
+    const suggestionsBox = document.getElementById('map-suggestions');
+    let searchDebounceTimer = null;
+
+    searchInput.addEventListener('input', function () {
+      const query = this.value;
+      if (query.length < 3) {
+        suggestionsBox.style.display = 'none';
+        return;
+      }
+
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        limitedAxios({
+          url: `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`,
+          method: 'GET'
+        })
+        .then(({ data }) => {
+          suggestionsBox.innerHTML = '';
+          data.slice(0, 5).forEach(place => {
+            const item = document.createElement('li');
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = place.display_name;
+            item.addEventListener('click', () => {
+              const lat = parseFloat(place.lat);
+              const lon = parseFloat(place.lon);
+              // Set map and marker if map is initialized
+              if (window.L && window.L.map) {
+                // Try to get the Leaflet map instance
+                let mapElem = document.getElementById('map');
+                if (mapElem && mapElem._leaflet_id) {
+                  let map = window.L.DomUtil.get(mapElem._leaflet_id);
+                  // But this is not the way to get the map instance; so instead, keep reference to map in openMapModal
+                }
+              }
+              // Actually, since map and marker are scoped in openMapModal, we need to use a workaround:
+              // We'll store last map/marker as window._map and window._marker
+              if (window._map && window._marker) {
+                window._map.setView([lat, lon], 16);
+                window._marker.setLatLng([lat, lon]);
+              }
+              document.getElementById('latitude').value = lat.toFixed(6);
+              document.getElementById('longitude').value = lon.toFixed(6);
+              searchInput.value = place.display_name;
+              suggestionsBox.style.display = 'none';
+            });
+            suggestionsBox.appendChild(item);
+          });
+          suggestionsBox.style.display = data.length ? 'block' : 'none';
+        })
+        .catch(() => {
+          suggestionsBox.style.display = 'none';
+        });
+      }, 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+        suggestionsBox.style.display = 'none';
+      }
+    });
+
+    // No patch needed, openMapModal now sets window._map and window._marker directly.
+  </script>
+</body>
+</html>

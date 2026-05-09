@@ -1,0 +1,632 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | SBLRent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "images/cover1.jpg" %}') no-repeat center center;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .register-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 2rem;
+    }
+    
+    .register-card {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+      animation: fadeInUp 0.5s ease;
+    }
+    
+    .register-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .register-body {
+      padding: 2rem;
+    }
+    
+    .form-control {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(67,97,238,0.25);
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--dark-color);
+    }
+    
+    .required-field::after {
+      content: " *";
+      color: #dc3545;
+    }
+    
+    .btn-register {
+      background-color: var(--primary-color);
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 8px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-register:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .login-link {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .login-link:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .input-group-text {
+      background-color: white;
+      border-right: none;
+    }
+    
+    .password-toggle {
+      cursor: pointer;
+      background-color: white;
+      border-left: none;
+    }
+    
+    .role-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1em;
+    }
+    
+    .alert {
+      border-radius: 8px;
+    }
+    
+    .file-upload {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-upload-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-upload-label {
+      display: block;
+      padding: 0.75rem 1rem;
+      border: 1px dashed #ced4da;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .file-upload-label:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(67,97,238,0.05);
+    }
+    
+    .file-upload-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #e9ecef;
+      display: block;
+      margin: 10px auto;
+    }
+    
+    .file-name {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+    
+    .vendor-fields {
+      display: none;
+    }
+    
+    @keyframes fadeInUp {
+      from {opacity:0; transform:translateY(20px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+    
+    @media (max-width: 576px) {
+      .register-container { padding: 1rem; }
+      .register-body { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% include 'navbar.html' %}
+  
+  <div class="register-container">
+    <div class="register-card">
+      <div class="register-header">
+        <h2><i class="fas fa-user-plus me-2"></i> Create Account</h2>
+        <p class="mb-0">Join SBLRent to find or list properties</p>
+      </div>
+      
+      <div class="register-body">
+  <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <input type="hidden" name="location" id="location">
+          <input type="hidden" name="latitude" id="latitude">
+          <input type="hidden" name="longitude" id="longitude">
+          
+          {% if messages %}
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+          
+          <!-- Profile Image Upload -->
+          <div class="mb-4 text-center">
+            <div class="file-upload">
+              <input type="file" id="profileImage" name="profile_image" class="file-upload-input" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+              <label for="profileImage" class="file-upload-label">
+                <img id="profilePreview" src="{% static 'images/default-avatar.jpg' %}" class="file-upload-preview" alt="Profile Preview">
+                <span>Click to upload profile photo</span>
+                <span class="file-name" id="profileFileName">JPEG or PNG, Max 5MB</span>
+              </label>
+            </div>
+          </div>
+          <div id="uploadWarning" class="alert alert-warning d-none" role="alert"></div>
+          
+          <!-- Name Fields -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="firstName" class="form-label required-field">First Name</label>
+              <input type="text" class="form-control" id="firstName" name="first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="lastName" class="form-label required-field">Last Name</label>
+              <input type="text" class="form-control" id="lastName" name="last_name" required>
+            </div>
+          </div>
+          
+          <!-- Email, Phone, Username -->
+          <div class="mt-3">
+            <label for="email" class="form-label required-field">Email Address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+          </div>
+          
+          <div class="mt-3">
+            <label for="phone" class="form-label required-field">Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-phone"></i></span>
+              <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{10}" required>
+            </div>
+            <div class="form-text">10-digit mobile number</div>
+          </div>
+          
+          <div class="mt-3">
+            <label for="username" class="form-label required-field">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+          </div>
+          
+          <!-- Password Fields -->
+          <div class="mt-3">
+            <label for="password" class="form-label required-field">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="password" name="password" required>
+              <span class="input-group-text password-toggle" id="togglePassword">
+                <i class="fas fa-eye"></i>
+              </span>
+            </div>
+            <div class="form-text">Use 8 or more characters with a mix of letters, numbers & symbols</div>
+          </div>
+          
+          <div class="mt-3">
+            <label for="confirmPassword" class="form-label required-field">Confirm Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+            </div>
+          </div>
+          
+          <!-- Role Selection -->
+          <div class="mt-3">
+            <label for="role" class="form-label required-field">I want to register as</label>
+            <select class="form-select role-select" id="role" name="role" required>
+              <option value="user">Tenant (Looking for a property)</option>
+              <option value="vendor">Vendor (Listing properties)</option>
+            </select>
+          </div>
+
+          <!-- Aadhaar Number and Card Upload (for all users) -->
+          <div class="mt-3">
+            <label for="aadhaarNumber" class="form-label required-field">Aadhaar Number</label>
+            <input type="text" class="form-control" id="aadhaarNumber" name="aadhaar_number" pattern="\d{12}" maxlength="12" minlength="12" required title="Aadhaar number must be exactly 12 digits">
+          </div>
+          <div class="mb-3">
+            <label for="aadhaarCard" class="form-label required-field">Aadhaar Card</label>
+            <div class="file-upload">
+              <input type="file" id="aadhaarCard" name="aadhaar_card" class="file-upload-input" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" required>
+              <label for="aadhaarCard" class="file-upload-label">
+                <i class="fas fa-id-card fs-1 text-muted"></i>
+                <div>Upload Aadhaar Card</div>
+                <span class="file-name" id="aadhaarFileName">JPEG, PNG or PDF, Max 5MB</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Vendor Fields: Documents & Bank Details -->
+          <div id="vendorFields" class="vendor-fields mt-3">
+            <div class="mb-3">
+              <div class="mb-3">
+              <label for="panNumber" class="form-label required-field">PAN Number</label>
+              <input type="text" class="form-control" id="panNumber" name="pan_number" placeholder="Enter PAN number">
+            </div>
+              <label for="panCard" class="form-label">PAN Card (Optional)</label>
+              <div class="file-upload">
+                <input type="file" id="panCard" name="pan_card" class="file-upload-input" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf">
+                <label for="panCard" class="file-upload-label">
+                  <i class="fas fa-credit-card fs-1 text-muted"></i>
+                  <div>Upload PAN Card</div>
+                  <span class="file-name" id="panFileName">JPEG, PNG or PDF, Max 5MB</span>
+                </label>
+              </div>
+              
+            </div>
+
+            
+            <!-- New Bank Details -->
+            <div class="mb-3">
+              <label for="bankAccount" class="form-label required-field">Bank Account Number</label>
+              <input type="text" class="form-control" id="bankAccount" name="bank_account_number" pattern="[0-9]{9,18}" placeholder="Enter bank account number">
+            </div>
+
+            <div class="mb-3">
+              <label for="ifscCode" class="form-label required-field">IFSC Code</label>
+              <input type="text" class="form-control" id="ifscCode" name="ifsc_code" pattern="[A-Za-z]{4}[a-zA-Z0-9]{7}" placeholder="Enter IFSC code">
+            </div>
+
+            <div class="mb-3">
+              <label for="companyName" class="form-label required-field">Company Name</label>
+              <input type="text" class="form-control" id="companyName" name="company_name" placeholder="Enter company name">
+            </div>
+
+            <!-- <div class="mb-3">
+              <label for="razorpayContactId" class="form-label">Razorpay Contact ID</label>
+              <input type="text" class="form-control" id="razorpayContactId" name="razorpay_contact_id" placeholder="Enter Razorpay Contact ID">
+            </div>
+            <div class="mb-3">
+              <label for="razorpayFundAccountId" class="form-label">Razorpay Fund Account ID</label>
+              <input type="text" class="form-control" id="razorpayFundAccountId" name="razorpay_fund_account_id" placeholder="Enter Razorpay Fund Account ID">
+            </div> -->
+          </div>
+          
+          <!-- Terms & Submit -->
+          <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="termsCheck" required>
+            <label class="form-check-label" for="termsCheck">
+              I agree to the <a href="#" class="login-link">Terms of Service</a> and <a href="#" class="login-link">Privacy Policy</a>
+            </label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-register mt-4">
+            <i class="fas fa-user-plus me-2"></i> Register Now
+          </button>
+          
+          <div class="text-center mt-4">
+            <p class="mb-0">Already have an account? <a href="/login" class="login-link">Sign in here</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const uploadWarning = document.getElementById('uploadWarning');
+
+    function showUploadWarning(message) {
+      if (!uploadWarning) return;
+      uploadWarning.textContent = message;
+      uploadWarning.classList.remove('d-none');
+      alert(message);
+    }
+
+    function clearUploadWarning() {
+      if (!uploadWarning) return;
+      uploadWarning.textContent = '';
+      uploadWarning.classList.add('d-none');
+    }
+
+    function getFileExtension(fileName) {
+      return (fileName.split('.').pop() || '').toLowerCase();
+    }
+
+    // Password toggle
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+    togglePassword.addEventListener('click', function() {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // File previews
+    const profileInput = document.getElementById('profileImage');
+    const profilePreview = document.getElementById('profilePreview');
+    const profileFileName = document.getElementById('profileFileName');
+    profileInput.addEventListener('change', function() {
+      clearUploadWarning();
+      const file = this.files[0];
+      if (file) {
+        const ext = getFileExtension(file.name);
+        const allowedExt = ['jpg', 'jpeg', 'png'];
+        const allowedMime = ['image/jpeg', 'image/png'];
+        const maxBytes = 5 * 1024 * 1024;
+
+        if (!allowedExt.includes(ext) || !allowedMime.includes(file.type)) {
+          this.value = '';
+          profileFileName.textContent = 'JPEG or PNG, Max 5MB';
+          showUploadWarning('Invalid profile photo. Only JPG/JPEG/PNG files are allowed. SVG is blocked for security.');
+          return;
+        }
+
+        if (file.size > maxBytes) {
+          this.value = '';
+          profileFileName.textContent = 'JPEG or PNG, Max 5MB';
+          showUploadWarning('Profile photo exceeds 5MB limit.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e){ profilePreview.src = e.target.result; };
+        reader.readAsDataURL(file);
+        profileFileName.textContent = file.name;
+      }
+    });
+
+
+    // Aadhaar number validation (12 digits) and file preview
+    const aadhaarNumberInput = document.getElementById('aadhaarNumber');
+    if (aadhaarNumberInput) {
+      aadhaarNumberInput.setAttribute('pattern', '\\d{12}');
+      aadhaarNumberInput.setAttribute('maxlength', '12');
+      aadhaarNumberInput.setAttribute('minlength', '12');
+      aadhaarNumberInput.setAttribute('title', 'Aadhaar number must be exactly 12 digits');
+    }
+    async function validateDocumentFile(file, fieldLabel) {
+      if (!file) return true;
+
+      const maxBytes = 5 * 1024 * 1024;
+      const allowedExt = ['pdf', 'jpg', 'jpeg', 'png'];
+      const allowedMime = ['application/pdf', 'image/jpeg', 'image/png'];
+      const extension = (file.name.split('.').pop() || '').toLowerCase();
+
+      if (!allowedExt.includes(extension)) {
+        showUploadWarning(`${fieldLabel} must be PDF, JPG, JPEG, or PNG. SVG is blocked for security.`);
+        return false;
+      }
+
+      if (!allowedMime.includes(file.type)) {
+        showUploadWarning(`${fieldLabel} has an invalid content type.`);
+        return false;
+      }
+
+      if (file.size > maxBytes) {
+        showUploadWarning(`${fieldLabel} exceeds 5MB.`);
+        return false;
+      }
+
+      if (extension === 'pdf') {
+        const headBuffer = await file.slice(0, 5).arrayBuffer();
+        const head = new TextDecoder('latin1').decode(headBuffer);
+        if (head !== '%PDF-') {
+          showUploadWarning(`${fieldLabel} must be a valid PDF.`);
+          return false;
+        }
+
+        const scanBuffer = await file.slice(0, Math.min(file.size, 1024 * 1024)).arrayBuffer();
+        const text = new TextDecoder('latin1').decode(scanBuffer);
+        const blockedTokens = ['/JavaScript', '/JS', '/OpenAction', '/AA', '/Launch', '/RichMedia', '/EmbeddedFile'];
+        if (blockedTokens.some(token => text.includes(token))) {
+          showUploadWarning(`${fieldLabel} contains active PDF content and was blocked.`);
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    const aadhaarInput = document.getElementById('aadhaarCard');
+    if (aadhaarInput) {
+      aadhaarInput.addEventListener('change', async function() {
+        clearUploadWarning();
+        const file = this.files[0];
+        if (file) {
+          const valid = await validateDocumentFile(file, 'Aadhaar card');
+          if (!valid) {
+            this.value = '';
+            document.getElementById('aadhaarFileName').textContent = 'JPEG, PNG or PDF, Max 5MB';
+            return;
+          }
+          document.getElementById('aadhaarFileName').textContent = file.name;
+        }
+      });
+    }
+
+    const panInput = document.getElementById('panCard');
+    panInput.addEventListener('change', async function() {
+      clearUploadWarning();
+      const file = this.files[0];
+      if (file) {
+        const valid = await validateDocumentFile(file, 'PAN card');
+        if (!valid) {
+          this.value = '';
+          document.getElementById('panFileName').textContent = 'JPEG, PNG or PDF, Max 5MB';
+          return;
+        }
+        document.getElementById('panFileName').textContent = file.name;
+      }
+    });
+
+    // Show/hide vendor fields
+    const roleSelect = document.getElementById('role');
+    const vendorFields = document.getElementById('vendorFields');
+    roleSelect.addEventListener('change', function() {
+      if (this.value === 'vendor') {
+        vendorFields.style.display = 'block';
+        document.getElementById('bankAccount').required = true;
+        document.getElementById('ifscCode').required = true;
+      } else {
+        vendorFields.style.display = 'none';
+        document.getElementById('bankAccount').required = false;
+        document.getElementById('ifscCode').required = false;
+      }
+    });
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async function(e) {
+      clearUploadWarning();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if(password.length < 8){ e.preventDefault(); showUploadWarning('Password must be at least 8 characters.'); return; }
+      if(password !== confirmPassword){ e.preventDefault(); showUploadWarning('Passwords do not match.'); return; }
+      if(!document.getElementById('termsCheck').checked){ e.preventDefault(); showUploadWarning('Agree to Terms & Privacy.'); return; }
+
+      // Aadhaar validation for all users
+      const aadhaarNumber = document.getElementById('aadhaarNumber').value;
+      const aadhaarFile = document.getElementById('aadhaarCard').files[0];
+      if(!aadhaarNumber.match(/^\d{12}$/)){
+        e.preventDefault(); showUploadWarning('Aadhaar number must be exactly 12 digits.'); return;
+      }
+      if(!aadhaarFile){ e.preventDefault(); showUploadWarning('Aadhaar Card is required.'); return; }
+      if(!(await validateDocumentFile(aadhaarFile, 'Aadhaar card'))){ e.preventDefault(); return; }
+
+      const panFile = document.getElementById('panCard').files[0];
+      if(panFile && !(await validateDocumentFile(panFile, 'PAN card'))){ e.preventDefault(); return; }
+
+      if(roleSelect.value === 'vendor'){
+        const bankAccount = document.getElementById('bankAccount').value;
+        const ifscCode = document.getElementById('ifscCode').value;
+        if(!bankAccount.match(/^[0-9]{9,18}$/)){ e.preventDefault(); showUploadWarning('Invalid Bank Account.'); return; }
+        if(!ifscCode.match(/^[A-Za-z]{4}[a-zA-Z0-9]{7}$/)){ e.preventDefault(); showUploadWarning('Invalid IFSC Code.'); return; }
+      }
+
+      const profileFile = document.getElementById('profileImage').files[0];
+      if (profileFile) {
+        const profileExt = getFileExtension(profileFile.name);
+        if (!['jpg', 'jpeg', 'png'].includes(profileExt) || !['image/jpeg', 'image/png'].includes(profileFile.type)) {
+          e.preventDefault();
+          showUploadWarning('Invalid profile photo. SVG is blocked for security.');
+          return;
+        }
+        if(profileFile.size > 5*1024*1024){ e.preventDefault(); showUploadWarning('Profile image exceeds 5MB.'); return; }
+      }
+    });
+  </script>
+
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lon;
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+          .then(response => response.json())
+          .then(data => {
+            let city = data.address.city || data.address.town || data.address.village || '';
+            let state = data.address.state || '';
+            let country = data.address.country || '';
+            let locationString = [city, state, country].filter(Boolean).join(', ');
+            document.getElementById('location').value = locationString;
+          })
+          .catch(() => {
+            document.getElementById('location').value = '';
+          });
+      }, function() {
+        document.getElementById('location').value = '';
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+      });
+    } else {
+      document.getElementById('location').value = '';
+      document.getElementById('latitude').value = '';
+      document.getElementById('longitude').value = '';
+    }
+  });
+  </script>
+</body>
+</html>

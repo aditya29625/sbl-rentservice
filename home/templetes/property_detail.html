@@ -1,0 +1,498 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ property.title }} | SBLRent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/css/lightgallery-bundle.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f5f7fa;
+    }
+    
+    .property-header {
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ property.images.first.image.url }}');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 4rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .property-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    .property-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    
+    .gallery-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .main-image {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+    
+    .thumbnail-container {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      overflow-x: auto;
+    }
+    
+    .thumbnail {
+      width: 100px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .thumbnail:hover {
+      transform: scale(1.05);
+    }
+    
+    .video-container {
+      position: relative;
+      margin-top: 1.5rem;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .property-video {
+      width: 100%;
+      max-height: 500px;
+      height: auto;
+      border-radius: 16px;
+      display: block;
+      margin: 0 auto;
+      transform-origin: center center;
+      transition: transform 0.3s ease;
+    }
+    
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: white;
+      opacity: 0.8;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .play-button:hover {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .property-section {
+      padding: 2rem;
+    }
+    
+    .section-title {
+      color: var(--primary-color);
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .property-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f8f9fa;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+    
+    .feature-icon {
+      color: var(--primary-color);
+    }
+    
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+    
+    .amenity-icon {
+      color: var(--primary-color);
+      width: 24px;
+      text-align: center;
+    }
+    
+    .map-container {
+      height: 400px;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .price-badge {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    .contact-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .owner-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary-color);
+    }
+    
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+    
+    @media (max-width: 768px) {
+      .main-image {
+        height: 300px;
+      }
+      
+      .amenities-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% include 'navbar.html' %}
+  
+  <div class="property-header text-center">
+    <div class="container">
+      <h1 class="display-4">{{ property.title }}</h1>
+      <div class="d-flex justify-content-center align-items-center gap-3">
+        <span><i class="fas fa-map-marker-alt"></i> {{ property.location }}</span>
+        <span><i class="fas fa-star"></i> {{ property.average_rating|default:"4.5" }} ({{ property.review_count|default:"24" }} reviews)</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="property-container">
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- Gallery Section -->
+        <div class="property-card">
+          <div class="gallery-container">
+            <h3 class="section-title d-flex align-items-center gap-2 ms-4 m-2">
+              <i class="fas fa-image"></i>
+              <span>Property Image</span>
+            </h3>
+            <img src="{{ property.images.first.image.url }}" 
+                 class="main-image"
+                 alt="{{ property.title }}"
+                 id="mainImage">
+            
+            <div class="thumbnail-container">
+              {% for image in property.images.all %}
+                <img src="{{ image.image.url }}" 
+                     class="thumbnail" 
+                     alt="Property image {{ forloop.counter }}"
+                     onclick="document.getElementById('mainImage').src = this.src">
+              {% endfor %}
+            </div>
+          </div>
+          
+          {% if property.video %}
+          <div class="property-section">
+            <h3 class="section-title"><i class="fas fa-video"></i> Property Video</h3>
+            <div class="video-container">
+              <video class="property-video" controls poster="{{ property.video_thumbnail.url }}">
+                <source src="{{ property.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Description Section -->
+        <div class="property-card">
+          <div class="property-section">
+            <h3 class="section-title"><i class="fas fa-align-left"></i> Description</h3>
+            <p>{{ property.description }}</p>
+            
+            <div class="property-features">
+              <div class="feature">
+                <i class="fas fa-bed feature-icon"></i>
+                <span>{{ property.bedrooms }} Bedrooms</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-bath feature-icon"></i>
+                <span>{{ property.bathrooms }} Bathrooms</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-ruler-combined feature-icon"></i>
+                <span>{{ property.area }} sq.ft</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-home feature-icon"></i>
+                <span>{{ property.get_property_type_display }}</span>
+              </div>
+              <div class="feature">
+                <i class="fas fa-calendar feature-icon"></i>
+                <span>Year Built: {{ property.year_built }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Amenities Section -->
+        {% if property.amenities %}
+        <div class="property-card">
+          <div class="property-section">
+            <h3 class="section-title"><i class="fas fa-list-check"></i> Amenities</h3>
+            <div class="amenities-grid">
+              {% for amenity in property.amenities %}
+                <div class="amenity-item">
+                  <span class="amenity-icon">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  <span>{{ amenity }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Location Section -->
+        <div class="property-card">
+          <div class="property-section">
+            <h3 class="section-title"><i class="fas fa-map-marked-alt"></i> Location</h3>
+            <p><i class="fas fa-map-marker-alt text-danger me-2"></i> {{ property.address }}, {{ property.city }}, {{ property.state }} {{ property.zip_code }}</p>
+            <p class="text-muted">
+              <i class="fas fa-location-crosshairs me-1"></i>
+              Coordinates: {{ property.latitude }}, {{ property.longitude }}
+            </p>
+            
+            <div class="map-container mt-4">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                scrolling="no" 
+                marginheight="0" 
+                marginwidth="0" 
+                src="https://maps.google.com/maps?q={{ property.latitude }},{{ property.longitude }}&z=15&output=embed">
+              </iframe>
+            </div>
+            <div class="mt-3 text-center">
+              <a href="https://www.google.com/maps/search/?api=1&query={{ property.latitude }},{{ property.longitude }}" 
+                 target="_blank" class="btn btn-outline-primary">
+                <i class="fas fa-map-location-dot me-2"></i> View on Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <!-- Booking Widget -->
+        <div class="property-card sticky-top" style="top: 80px;">
+          <div class="property-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <span class="price-badge">₹{{ property.price }}/month</span>
+              
+             
+           
+            </div>
+            {% if property.status == 'active' %}
+            <a href="{% url 'book_property' property.id %}" class="btn btn-primary btn-lg w-100 mb-3">
+              <i class="fas fa-calendar-check me-2"></i> Book Now
+            </a>
+            {% endif %}
+
+            <div class="text-center mb-4">
+              <small class="text-muted">No booking fees. Free cancellation within 24 hours.</small>
+            </div>
+            
+            <div class="contact-card" > 
+              <div class="text-center mb-3">
+                
+                <h5>{{ property.owner.get_full_name }}</h5>
+                <p class="text-muted">Property Owner</p>
+              </div>
+              
+              <div class="d-grid gap-2">
+                <a href="tel:{{ property.owner.phone }}" class="btn btn-outline-primary">
+                  <i class="fas fa-phone me-2"></i> Call Owner
+                </a>
+                <a href="mailto:{{ property.owner.email }}" class="btn btn-outline-primary">
+                  <i class="fas fa-envelope me-2"></i> Email Owner
+                </a>
+                <a href="https://wa.me/{{ property.owner.phone }}" class="btn btn-outline-primary">
+                  <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/lightgallery.min.js"></script>
+  <script>
+  
+  
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar-premium');
+      if (window.scrollY > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Active link highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link-premium');
+      
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Tooltip initialization
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize light gallery for images
+    document.addEventListener('DOMContentLoaded', function() {
+      const mainImage = document.getElementById('mainImage');
+      
+      mainImage.addEventListener('click', function() {
+        const images = [
+          {% for image in property.images.all %}
+            { src: '{{ image.image.url }}' },
+          {% endfor %}
+        ];
+        
+        const dynamicGallery = lightGallery(document.createElement('div'), {
+          dynamic: true,
+          dynamicEl: images,
+          download: false,
+          zoom: true
+        });
+        
+        dynamicGallery.openGallery(0);
+      });
+      
+      // Video play button functionality
+      const video = document.querySelector('.property-video');
+      if (video) {
+        const playButton = document.createElement('i');
+        playButton.className = 'fas fa-play-circle play-button';
+        playButton.style.position = 'absolute';
+        playButton.style.top = '50%';
+        playButton.style.left = '50%';
+        playButton.style.transform = 'translate(-50%, -50%)';
+        playButton.style.fontSize = '48px';
+        playButton.style.color = 'white';
+        playButton.style.opacity = '0.8';
+        playButton.style.cursor = 'pointer';
+        playButton.addEventListener('click', function () {
+          video.play();
+        });
+        video.parentNode.appendChild(playButton);
+
+        // Hide play button on play
+        video.addEventListener('play', function () {
+          playButton.style.display = 'none';
+        });
+
+        // Show play button on pause or ended
+        video.addEventListener('pause', function () {
+          playButton.style.display = 'block';
+        });
+        video.addEventListener('ended', function () {
+          playButton.style.display = 'block';
+        });
+      }
+    });
+  </script>
+</body>
+</html>

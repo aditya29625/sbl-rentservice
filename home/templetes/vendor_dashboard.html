@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Dashboard | SBLRent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-light: #eef2ff;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --light-bg: #f8f9fa;
+      --dark-color: #212529;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .dashboard-header {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 30px;
+      border-left: 5px solid var(--primary-color);
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      height: 100%;
+      border-top: 3px solid transparent;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .stat-card.total-properties {
+      border-top-color: var(--primary-color);
+    }
+
+    .stat-card.inquiries {
+      border-top-color: var(--success-color);
+    }
+
+    .stat-card.pending {
+      border-top-color: var(--warning-color);
+    }
+
+    .stat-card h3 {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .stat-card .icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .stat-card.total-properties .icon {
+      background-color: var(--primary-light);
+      color: var(--primary-color);
+    }
+
+    .stat-card.inquiries .icon {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success-color);
+    }
+
+    .stat-card.pending .icon {
+      background-color: rgba(255, 193, 7, 0.1);
+      color: var(--warning-color);
+    }
+
+    .search-container {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 30px;
+    }
+
+    .property-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+    }
+
+    .property-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .property-img-container {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .property-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .property-card:hover .property-img {
+      transform: scale(1.05);
+    }
+
+    .property-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 2;
+    }
+
+    .status-active {
+      background: #e6f7ee;
+      color: #00a854;
+    }
+
+    .status-pending {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .status-rented {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+
+    .status-inactive {
+      background: #fff1f0;
+      color: #f5222d;
+    }
+
+    .property-actions {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark-color);
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .action-btn.edit:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .action-btn.delete:hover {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .empty-state-icon {
+      font-size: 72px;
+      color: #e9ecef;
+      margin-bottom: 20px;
+    }
+
+    .floating-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .floating-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+    }
+
+    .progress-thin {
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      height: 100%;
+    }
+
+    .activity-timeline {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      height: 100%;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 20px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      z-index: 1;
+    }
+
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: 13px;
+      top: 17px;
+      width: 2px;
+      height: calc(100% - 17px);
+      background: #e9ecef;
+    }
+
+    .timeline-item:last-child::after {
+      display: none;
+    }
+
+    .custom-tooltip {
+      --bs-tooltip-bg: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        padding: 20px 15px;
+      }
+
+      .stat-card {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'navbar.html' %}
+
+{% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="dashboard-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="h3 mb-2">Welcome back, {{ request.user.first_name }}</h1>
+          <p class="text-muted mb-0">Here's what's happening with your properties today</p>
+        </div>
+        <div class="col-md-6">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="row g-4 mb-4 m-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card total-properties">
+        <div class="icon">
+          <i class="fas fa-home fs-4"></i>
+        </div>
+        <h3>{{ properties|length }}</h3>
+        <p class="text-muted mb-3">Total Properties</p>
+        <div class="progress progress-thin">
+          <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card inquiries">
+        <div class="icon">
+          <i class="fas fa-envelope fs-4"></i>
+        </div>
+        <h3>{{ inquiries_count|default:"24" }}</h3>
+        <p class="text-muted mb-3">Inquiries</p>
+        <div class="progress progress-thin">
+          <div class="progress-bar bg-info" role="progressbar" style="width: 45%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card pending">
+        <div class="icon">
+          <i class="fas fa-clock fs-4"></i>
+        </div>
+        <h3>{{ pending_count|default:"3" }}</h3>
+        <p class="text-muted mb-3">Pending Approvals</p>
+        <div class="progress progress-thin">
+          <div class="progress-bar bg-warning" role="progressbar" style="width: 25%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="chart-container">
+        <h6 class="mb-3">Performance</h6>
+        <canvas id="performanceChart" height="130"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="row g-4 mb-4 m-4">
+    <!-- Sidebar Section (Moved Left) -->
+    <div class="stat-card col-lg-4">
+      <!-- Activity Timeline -->
+      <div class="text-center">
+        <h5 class="mb-4 text-primary fw-semibold"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+      </div>
+      <div class="activity-timeline mb-4 p-3" style="max-height: 430px; overflow-y: auto;">
+
+        <div class="d-flex flex-column gap-4">
+          <div class="timeline-item">
+            <h6 class="fw-bold mb-1 text-dark">New inquiry received</h6>
+            <p class="text-muted small mb-1">For your property in Koramangala</p>
+            <small class="text-muted"><i class="far fa-clock me-1"></i>2 hours ago</small>
+          </div>
+          <div class="timeline-item">
+            <h6 class="fw-bold mb-1 text-dark">Property approved</h6>
+            <p class="text-muted small mb-1">"Luxury Apartment in HSR Layout" is now active</p>
+            <small class="text-muted"><i class="far fa-clock me-1"></i>1 day ago</small>
+          </div>
+          <div class="timeline-item">
+            <h6 class="fw-bold mb-1 text-dark">New booking</h6>
+            <p class="text-muted small mb-1">Your property in Whitefield has been rented</p>
+            <small class="text-muted"><i class="far fa-clock me-1"></i>3 days ago</small>
+          </div>
+          <div class="timeline-item">
+            <h6 class="fw-bold mb-1 text-dark">Payment received</h6>
+            <p class="text-muted small mb-1">₹25,000 for your property in Indiranagar</p>
+            <small class="text-muted"><i class="far fa-clock me-1"></i>1 week ago</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div style="min-height: 400px;">
+        <div class="chart-container p-3 d-flex flex-column align-items-center justify-content-center"
+          style="height: 100%;">
+          <h5 class="mb-4 text-primary fw-semibold text-center"><i class="fas fa-chart-pie me-2"></i>Property Status
+          </h5>
+          <canvas id="statusChart" height="200" style="max-width: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties Section (Moved Right) -->
+    <div class="col-lg-8">
+      <!-- Search and Filter Section -->
+      <div class="search-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">Your Properties</h4>
+          <div class="d-flex">
+            <div class="input-group me-3" style="width: 250px;">
+              <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+              <input type="text" id="propertySearch" class="form-control" placeholder="Search properties...">
+            </div>
+            <select class="form-select" id="propertyFilter" style="width: 150px;">
+              <option selected value="all">All</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="rented">Rented</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div id="property-list">
+          {% include 'partials/_vendor_properties.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <a href="{% url 'add_property' %}"
+    class="floating-btn btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+    style="width: 60px; height: 60px;">
+    <i class="fas fa-plus fs-4"></i>
+  </a>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger: 'hover',
+        customClass: 'custom-tooltip'
+      })
+    });
+
+    // Search functionality
+    document.getElementById('propertySearch').addEventListener('input', function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const propertyItems = document.querySelectorAll('.property-item');
+
+      propertyItems.forEach(item => {
+        const title = item.querySelector('h5').textContent.toLowerCase();
+        const location = item.querySelector('.text-muted').textContent.toLowerCase();
+
+        if (title.includes(searchTerm) || location.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+
+    // Filter functionality
+    document.getElementById('propertyFilter').addEventListener('change', function (e) {
+      const filterValue = e.target.value;
+      const propertyItems = document.querySelectorAll('.property-item');
+
+      propertyItems.forEach(item => {
+        const status = item.getAttribute('data-status');
+
+        if (filterValue === 'all' || status === filterValue) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const performanceChart = new Chart(performanceCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Performance',
+          data: [12, 19, 15, 25, 22, 30],
+          backgroundColor: 'rgba(67, 97, 238, 0.1)',
+          borderColor: 'rgba(67, 97, 238, 1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: 'white',
+          pointBorderColor: 'rgba(67, 97, 238, 1)',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            display: false,
+            beginAtZero: true
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#6c757d'
+            }
+          }
+        },
+        elements: {
+          line: {
+            borderJoinStyle: 'round'
+          }
+        }
+      }
+    });
+
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Pending', 'Rented', 'Inactive'],
+        datasets: [{
+          data: [{{ stats.active_properties|default:0 }}, {{ stats.pending_properties|default:0 }}, {{ stats.rented_properties|default:0 }}, 2],
+    backgroundColor: [
+      '#00a854',
+      '#fa8c16',
+      '#1890ff',
+      '#f5222d'
+    ],
+      borderWidth: 0,
+        hoverOffset: 10
+        }]
+      },
+    options: {
+      responsive: true,
+        cutout: '70%',
+          plugins: {
+        legend: {
+          position: 'bottom',
+            labels: {
+            usePointStyle: true,
+              pointStyle: 'circle',
+                padding: 20
+          }
+        }
+      }
+    }
+    });
+
+    function loadProperties(url) {
+      fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('property-list').innerHTML = data.html;
+          attachPaginationHandlers();
+        });
+    }
+
+    function attachPaginationHandlers() {
+      document.querySelectorAll('#property-list .pagination a').forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          const url = this.getAttribute('href');
+          loadProperties(url);
+        });
+      });
+    }
+
+    // Run once on load
+    attachPaginationHandlers();
+  </script>
+</body>
+
+</html>

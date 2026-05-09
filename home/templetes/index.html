@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SBLRent | House Rental Platform in India - Find Homes & PGs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+    content="SBLRent helps you find verified rental homes, flats, PGs, and commercial spaces in India. Browse listings, compare options, and book your next rental easily." />
+  <meta name="keywords"
+    content="SBLRent, house rent, rental homes, flats for rent, PG for rent, commercial property rent, property listing India" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="SBLRent" />
+  <link rel="canonical" href="https://sblrent.sblconstruction.in/" />
+  <meta name="theme-color" content="#4361ee" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SBLRent" />
+  <meta property="og:title" content="SBLRent | House Rental Platform in India" />
+  <meta property="og:description"
+    content="Discover verified rental homes, flats, PGs, and commercial spaces with SBLRent." />
+  <meta property="og:url" content="https://sblrent.sblconstruction.in/" />
+  <meta property="og:image" content="https://sblrent.sblconstruction.in/static/images/logo-icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SBLRent | House Rental Platform in India" />
+  <meta name="twitter:description"
+    content="Find verified rental homes, flats, PGs, and commercial spaces across India." />
+  <meta name="twitter:image" content="https://sblrent.sblconstruction.in/static/images/logo-icon.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "SBLRent",
+    "description": "SBLRent is a rental startup platform that helps people discover verified homes, flats, PGs, and commercial rental properties in India.",
+    "url": "https://sblrent.sblconstruction.in/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://sblrent.sblconstruction.in/properties/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "SBLRent",
+    "description": "SBLRent is a property rental startup connecting tenants with verified rental listings, transparent pricing, and a smooth booking experience.",
+    "url": "https://sblrent.sblconstruction.in/",
+    "logo": "https://sblrent.sblconstruction.in/static/images/logo-icon.png"
+  }
+  </script>
+  <!-- CSP meta tag goes here -->
+  <!-- <meta http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com;
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+        img-src 'self' data: https://randomuser.me https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://sblrentmedia01.blob.core.windows.net;
+        connect-src 'self' https://nominatim.openstreetmap.org;
+      "> -->
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    .book-now-btn:hover {
+      background-color: #28a745 !important;
+      color: white !important;
+      border-color: #28a745 !important;
+    }
+
+    :root {
+      --primary-color: #4361ee;
+      --primary-light: #e6e9ff;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --text-color: #333333;
+      --text-light: #6c757d;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --transition: all 0.3s ease-in-out;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: 600;
+    }
+
+    a {
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn {
+      font-weight: 500;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-lg {
+      padding: 0.8rem 2rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline-light:hover {
+      color: var(--primary-color);
+      background-color: white;
+    }
+
+    /* Hero Section */
+    .hero {
+      background-size: cover;
+      background-position: center;
+      color: white;
+      height: 95vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0 1rem;
+      text-align: center;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right,
+          rgba(0, 0, 0, 0.7),
+          rgba(0, 0, 0, 0.4));
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      padding: 2rem;
+      margin: 0 auto;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      opacity: 0.9;
+    }
+
+    .hero-buttons .btn {
+      margin: 0 0.5rem;
+    }
+
+    /* Carousel Indicators */
+    .carousel-indicators [data-bs-target] {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: white;
+      opacity: 0.5;
+      transition: var(--transition);
+      margin: 0 6px;
+    }
+
+    .carousel-indicators .active {
+      opacity: 1;
+      background-color: var(--primary-color);
+      transform: scale(1.3);
+    }
+
+    /* Features Section */
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      background-color: var(--primary-light);
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .feature-card {
+      padding: 2.5rem 2rem;
+      border-radius: 12px;
+      transition: var(--transition);
+      height: 100%;
+      background: white;
+      border: none;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-card h4 {
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+
+    /* Property Cards */
+    .property-card {
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      height: 100%;
+      background: white;
+    }
+
+    .property-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .property-card .card-img-top {
+      height: 220px;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .property-card:hover .card-img-top {
+      transform: scale(1.03);
+    }
+
+    .badge-featured {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.35rem 0.65rem;
+      background-color: var(--accent-color);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .price-tag {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+
+    .property-meta {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(248, 249, 250, 0.8);
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+    }
+
+    .property-meta>div {
+      text-align: center;
+    }
+
+    .property-meta i {
+      color: var(--primary-color);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .property-meta small {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .card-footer {
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 0.75rem 1.25rem;
+    }
+
+    .card-footer small {
+      font-size: 0.8rem;
+    }
+
+    .card-footer i {
+      color: var(--primary-color);
+      margin-right: 0.35rem;
+    }
+
+    /* Section Titles */
+    .section-title {
+      position: relative;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    /* Testimonials */
+    .testimonial-card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: var(--shadow-sm);
+      padding: 1.5rem;
+      height: 100%;
+    }
+
+    .testimonial-card .stars {
+      color: #ffd700;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-card .card-text {
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Call to Action */
+    .cta-section {
+      background: linear-gradient(135deg,
+          var(--primary-color),
+          var(--secondary-color));
+      color: white;
+      padding: 4rem 0;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--dark-color);
+      color: white;
+      padding: 3rem 0 1.5rem;
+    }
+
+    .footer-links h5 {
+      color: white;
+      margin-bottom: 1.25rem;
+      font-size: 1.1rem;
+    }
+
+    .footer-links ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: white;
+      padding-left: 5px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        height: 80vh;
+        min-height: 500px;
+      }
+
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .hero-buttons .btn {
+        display: block;
+        width: 80%;
+        margin: 0 auto 1rem;
+      }
+
+      .feature-card {
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .hero {
+        height: 70vh;
+        min-height: 400px;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero-content {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% load static %}
+
+     {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+    <!-- Navbar -->
+  {% include 'navbar.html'%}
+
+  <!-- Hero Carousel Section -->
+  <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"
+        aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="hero" style="background-image: url('{% static 'images/cover1.jpg' %}')">
+          <div class="hero-content">
+            <h1 class="display-4 fw-bold">Find Your Dream Rental</h1>
+            <p class="lead">
+              Discover apartments and homes easily with SBLRent – your
+              reliable, fast, and affordable rental platform.
+            </p>
+            <div class="hero-buttons">
+              <a href="/properties" class="btn btn-primary btn-lg px-4">
+                Explore Properties
+              </a>
+              <a href="#featured-properties" class="btn btn-outline-light btn-lg px-4">
+                Featured Homes
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero" style="background-image: url('{% static 'images/cover2.jpg' %}')">
+          <div class="hero-content">
+            <h1 class="display-4 fw-bold">Comfortable Living Spaces</h1>
+            <p class="lead">
+              Browse through a curated list of verified and cozy homes in your
+              city.
+            </p>
+            <div class="hero-buttons">
+              <a href="/properties" class="btn btn-primary btn-lg px-4">
+                Browse Properties
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero" style="background-image: url('{% static 'images/cover3.jpg' %}')">
+          <div class="hero-content">
+            <h1 class="display-4 fw-bold">Easy & Transparent Rentals</h1>
+            <p class="lead">
+              Experience a seamless rental process with no hidden costs or
+              confusion.
+            </p>
+             {% if not user.is_authenticated %}
+            <div class="hero-buttons">
+
+              <a href="/login" class="btn btn-primary btn-lg px-4">Get Started</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <!-- About Business / SEO Content -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 text-center">
+          <h2 class="section-title mb-3">What Does SBLRent Do?</h2>
+          <p class="lead mb-0">
+            SBLRent is a rental startup that helps tenants find verified rental properties including apartments,
+            independent houses, PG accommodations, and commercial spaces. The platform makes renting simple with
+            transparent pricing, easy property search, and a fast booking process for users and property owners.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-5 bg-light">
+    <div class="container py-5">
+      <h2 class="text-center mb-5 section-title">Why Choose SBLRent?</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h4>Verified Listings</h4>
+            <p>
+              All properties are personally verified and inspected for quality
+              assurance to ensure you get exactly what you see.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-tag"></i>
+            </div>
+            <h4>Affordable Pricing</h4>
+            <p>
+              Find homes that suit every budget with transparent pricing and
+              no hidden charges. We negotiate the best rates for you.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h4>24/7 Support</h4>
+            <p>
+              Our dedicated support team is here to assist you anytime with
+              any queries or issues you might have.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Properties -->
+  <section id="featured-properties" class="py-5">
+    <div class="container py-5">
+      <h2 class="text-center mb-5 section-title">Featured Properties</h2>
+
+      <!-- Improved Property Search UI -->
+      <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+          <form class="row align-items-end g-2 p-3 bg-white rounded-4 shadow-sm" method="get" action="{% url 'property_list' %}">
+            <div class="col-lg-3 col-md-4 col-12">
+              <label for="location" class="form-label mb-1"><i class="fas fa-map-marker-alt me-1"></i>Location</label>
+              <input type="text" class="form-control" id="location" name="location" placeholder="City, Neighborhood or Address" />
+            </div>
+            <div class="col-lg-2 col-md-2 col-6">
+              <label for="zip_code" class="form-label mb-1"><i class="fas fa-mail-bulk me-1"></i>Zip</label>
+              <input type="text" class="form-control" id="zip_code" name="zip_code" placeholder="Zip Code" />
+            </div>
+            <div class="col-lg-2 col-md-2 col-6">
+              <label for="property-type" class="form-label mb-1"><i class="fas fa-home me-1"></i>Type</label>
+              <select id="property-type" name="property_type" class="form-select">
+                <option value="">All</option>
+                <option value="Apartment">Apartment</option>
+                <option value="House">House</option>
+                <option value="Villa">Villa</option>
+                <option value="Condo">Condo</option>
+                <option value="Land">Land</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+            <div class="col-lg-2 col-md-2 col-6">
+              <label for="price-range" class="form-label mb-1"><i class="fas fa-rupee-sign me-1"></i>Price</label>
+              <select id="price-range" name="price_range" class="form-select">
+                <option value="">Any</option>
+                <option value="Under ₹10,000">Under ₹10,000</option>
+                <option value="₹10,000-₹20,000">₹10,000-₹20,000</option>
+                <option value="₹20,000-₹30,000">₹20,000-₹30,000</option>
+                <option value="Over ₹30,000">Over ₹30,000</option>
+              </select>
+            </div>
+            <!-- Hidden fields for lat/lng -->
+            <input type="hidden" id="lat" name="user_lat" value="{{ request.GET.user_lat }}">
+            <input type="hidden" id="lng" name="user_lng" value="{{ request.GET.user_lng }}">
+            <div class="col-lg-3 col-md-4 col-12 d-flex gap-2">
+              <button type="button" class="btn btn-outline-primary flex-shrink-0" onclick="openMapModal()" title="Pick on Map">
+                <i class="fas fa-map"></i>
+              </button>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search me-1"></i>Search
+              </button>
+              
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Replace featured_properties loop and pagination with this wrapper -->
+      <div id="featured-properties-ajax">
+        {% include 'partials/_featured_properties.html' %}
+      </div>
+
+      <!-- Recently Added Properties -->
+      <section id="recent-properties" class="py-5 bg-light mt-5">
+        <div class="container py-5">
+          <h2 class="text-center mb-5 section-title">Recently Added</h2>
+          <div class="row">
+            <div id="recent-properties-ajax">
+              {% include 'partials/_recent_properties.html' %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="text-center mt-5">
+        <a href="/properties" class="btn btn-primary btn-lg px-5">
+          View All Properties <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-5">
+    <div class="container py-5">
+      <h2 class="text-center mb-5 section-title">What Our Customers Say</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <p class="card-text">
+              "Found my perfect apartment in just 2 days! The process was so
+              smooth and the team was extremely helpful throughout."
+            </p>
+            <div class="d-flex align-items-center">
+              <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Jasmeet Kaur" class="rounded-circle me-3"
+                width="50" />
+              <div>
+                <h6 class="mb-0">Jasmeet Kaur</h6>
+                <small class="text-muted">Punjab</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <p class="card-text">
+              "The verification process gave me confidence in my rental
+              choice. Highly recommend SBLRent for hassle-free rentals."
+            </p>
+            <div class="d-flex align-items-center">
+              <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Rahul Mehta" class="rounded-circle me-3"
+                width="50" />
+              <div>
+                <h6 class="mb-0">Rahul Mehta</h6>
+                <small class="text-muted">Mumbai</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+            <p class="card-text">
+              "As a first-time renter, I was nervous but SBLRent made
+              everything so easy. Will definitely use again when I move!"
+            </p>
+            <div class="d-flex align-items-center">
+              <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Priya Sharma" class="rounded-circle me-3"
+                width="50" />
+              <div>
+                <h6 class="mb-0">Priya Sharma</h6>
+                <small class="text-muted">Delhi</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta-section">
+    <div class="container text-center py-5">
+      <div class="cta-content">
+        <h2 class="mb-4 display-5 fw-bold">Ready to Find Your New Home?</h2>
+        <p class="lead mb-5">
+          Join thousands of happy renters who found their perfect home with
+          SBLRent. Start your search today!
+        </p>
+        <div class="d-flex justify-content-center flex-wrap">
+          <a href="/properties" class="btn btn-light btn-lg px-4 me-3 mb-3">Browse Properties</a>
+          {% if not user.is_authenticated %}
+          <a href="/register" class="btn btn-outline-light btn-lg px-4 mb-3">Sign Up Now</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-links">
+            <h5>SBLRent</h5>
+            <p class="text-muted">
+              Your trusted partner for finding the perfect rental home.
+              Quality, transparency, and convenience at every step.
+            </p>
+            <div class="social-links mt-4">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <div class="footer-links">
+            <h5>Quick Links</h5>
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/service">Properties</a></li>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/contact">Contact</a></li>
+              <li><a href="/blog">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <div class="footer-links">
+            <h5>Support</h5>
+            <ul>
+              <li><a href="/faq">FAQ</a></li>
+              <li><a href="/help">Help Center</a></li>
+              <li><a href="/terms">Terms of Service</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/refund">Refund Policy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <div class="footer-links">
+            <h5>Newsletter</h5>
+            <p class="text-muted">
+              Subscribe to get updates on new properties and special offers.
+            </p>
+            <div class="input-group mb-3 mt-3">
+              <input type="email" class="form-control newsletter-input" placeholder="Your Email" />
+              <button class="btn newsletter-btn" type="button">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <small class="text-muted">We'll never share your email with anyone else.</small>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4 bg-secondary" />
+      <div class="row">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <p class="mb-0">&copy; 2025 SBLRent. All rights reserved.</p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <p class="mb-0">
+            Made with <i class="fas fa-heart text-danger"></i> in India
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Map Modal -->
+  <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mapModalLabel">Select Location</h5>
+          <button type="button" class="btn btn-outline-primary btn-sm ms-2" onclick="locateMeOnMap()">
+            <i class="fas fa-crosshairs"></i> Locate Me
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="height: 400px; position: relative;">
+          <input type="text" id="map-search" class="form-control mb-2" placeholder="Search for a location..." autocomplete="off">
+          <ul id="map-suggestions" class="list-group position-absolute bg-white border rounded shadow"
+              style="top: 45px; left: 0; right: 0; z-index: 9999; max-height: 250px; overflow-y: auto; display: none;">
+          </ul>
+          <div id="map" style="height: 100%; width: 100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+
+    // Wishlist event delegation: only one handler for all .wishlist-btn
+    document.addEventListener("DOMContentLoaded", function () {
+      document.body.addEventListener("click", function (e) {
+        const btn = e.target.closest(".wishlist-btn");
+        if (!btn) return;
+        e.preventDefault();
+        const icon = btn.querySelector("i");
+        // Use data-property-id for consistency
+        const propertyId = btn.getAttribute("data-property-id") || btn.getAttribute("data-id");
+        if (!propertyId) return;
+
+        // Optimistic UI update
+        const isSaved = icon.classList.contains("fas");
+        if (isSaved) {
+          icon.classList.remove("fas");
+          icon.classList.add("far");
+          btn.classList.remove("btn-danger");
+          btn.classList.add("btn-outline-secondary");
+        } else {
+          icon.classList.remove("far");
+          icon.classList.add("fas");
+          btn.classList.remove("btn-outline-secondary");
+          btn.classList.add("btn-danger");
+        }
+
+        fetch(`/wishlist/toggle/${propertyId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        })
+          .then(async res => {
+            if (res.status === 401) {
+              // If backend returns 401, redirect to login page
+              let data;
+              try {
+                data = await res.json();
+              } catch (e) {
+                // fallback if not JSON
+                window.location.href = "/login";
+                return;
+              }
+              if (data && data.login_url) {
+                window.location.href = data.login_url;
+              } else {
+                window.location.href = "/login";
+              }
+              return;
+            }
+            return res.json();
+          })
+          .then(data => {
+            if (!data) return;
+            if (data.status === "added") {
+              btn.classList.remove("btn-outline-secondary");
+              btn.classList.add("btn-danger");
+              icon.classList.remove("far");
+              icon.classList.add("fas");
+            } else if (data.status === "removed") {
+              btn.classList.remove("btn-danger");
+              btn.classList.add("btn-outline-secondary");
+              icon.classList.remove("fas");
+              icon.classList.add("far");
+            }
+          })
+          .catch(error => {
+            console.error('Error toggling wishlist:', error);
+          });
+      });
+    });
+
+    // Initialize carousel
+    const myCarousel = document.getElementById("heroCarousel");
+    const carousel = new bootstrap.Carousel(myCarousel, {
+      interval: 5000,
+      wrap: true,
+    });
+
+    // Toggle save button state
+    document.addEventListener("DOMContentLoaded", function () {
+      // (save button logic moved to attachSaveListeners above)
+
+      // Add animation class when elements come into view
+      const animateOnScroll = () => {
+        const elements = document.querySelectorAll(
+          ".feature-card, .property-card, .testimonial-card"
+        );
+
+        elements.forEach((element) => {
+          const elementPosition = element.getBoundingClientRect().top;
+          const screenPosition = window.innerHeight / 1.2;
+
+          if (elementPosition < screenPosition) {
+            element.style.opacity = "1";
+            element.style.transform = "translateY(0)";
+          }
+        });
+      };
+
+      // Set initial state for animation
+      document
+        .querySelectorAll(".feature-card, .property-card, .testimonial-card")
+        .forEach((el) => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)";
+          el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+        });
+
+      window.addEventListener("load", animateOnScroll);
+      window.addEventListener("scroll", animateOnScroll);
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute("href")).scrollIntoView({
+          behavior: "smooth",
+        });
+      });
+    });
+
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("#featured-properties-ajax .pagination a")) {
+        e.preventDefault();
+        const url = e.target.closest("a").getAttribute("href");
+
+        fetch(url, {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.querySelector("#featured-properties-ajax").innerHTML =
+              data.html;
+            attachSaveListeners(); // Re-bind save button behavior after AJAX update
+            window.scrollTo({
+              top:
+                document.querySelector("#featured-properties-ajax")
+                  .offsetTop - 50,
+              behavior: "smooth",
+            });
+          });
+      }
+    });
+
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("#recent-properties-ajax .pagination a")) {
+        e.preventDefault();
+        const url = e.target.closest("a").getAttribute("href");
+
+        fetch(url, {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.querySelector("#recent-properties-ajax").innerHTML =
+              data.html;
+            attachSaveListeners(); // Re-bind save button behavior after AJAX update
+            window.scrollTo({
+              top:
+                document.querySelector("#recent-properties-ajax").offsetTop -
+                50,
+              behavior: "smooth",
+            });
+          });
+      }
+    });
+
+
+    // Helper to get CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          // Fetch properties near the user's location and update the featured section
+          fetch(`/?user_lat=${lat}&user_lng=${lng}`, {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest"
+            }
+          })
+            .then(response => response.text())
+            .then(html => {
+              document.getElementById('featured-properties-ajax').innerHTML = html;
+              attachSaveListeners(); // Re-bind save button behavior after AJAX update
+            })
+            .catch(error => {
+              console.error("Error fetching properties:", error);
+            });
+        }, function (error) {
+          console.log("Location access denied or unavailable.");
+        });
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    });
+
+    // Map Modal
+    function openMapModal() {
+      const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+      modal.show();
+
+      setTimeout(() => {
+        let latInput = document.getElementById('lat');
+        let lngInput = document.getElementById('lng');
+        let lat = latInput && latInput.value ? parseFloat(latInput.value) : 20.5937;
+        let lng = lngInput && lngInput.value ? parseFloat(lngInput.value) : 78.9629;
+
+        if (window._map) {
+          window._map.remove();
+        }
+
+        window._map = L.map('map').setView([lat, lng], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(window._map);
+
+        window._marker = L.marker([lat, lng], { draggable: true }).addTo(window._map);
+        window._marker.on('dragend', function(e) {
+          const { lat, lng } = window._marker.getLatLng();
+          if (latInput) latInput.value = lat.toFixed(6);
+          if (lngInput) lngInput.value = lng.toFixed(6);
+        });
+
+        window._map.on('click', function(e) {
+          window._marker.setLatLng(e.latlng);
+          if (latInput) latInput.value = e.latlng.lat.toFixed(6);
+          if (lngInput) lngInput.value = e.latlng.lng.toFixed(6);
+        });
+      }, 300);
+    }
+
+    function locateMeOnMap() {
+      if (!window._map) return;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          window._map.setView([lat, lng], 14);
+          window._marker.setLatLng([lat, lng]);
+          document.getElementById('lat').value = lat.toFixed(6);
+          document.getElementById('lng').value = lng.toFixed(6);
+        }, function (error) {
+          alert("Unable to retrieve your location. Please give permission. Please contact developer Niraj Sahani.");
+        });
+      } else {
+        alert("Geolocation is not supported by your browser. Please contact developer Niraj Sahani.");
+      }
+    }
+
+    // Attach search suggestion listeners only once
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('map-search');
+      const suggestionsBox = document.getElementById('map-suggestions');
+
+      if (searchInput && suggestionsBox) {
+        searchInput.addEventListener('input', function () {
+          const query = this.value.trim();
+          if (query.length < 3) {
+            suggestionsBox.style.display = 'none';
+            return;
+          }
+
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+              suggestionsBox.innerHTML = '';
+              data.slice(0, 5).forEach(place => {
+                const item = document.createElement('li');
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = place.display_name;
+                item.addEventListener('click', () => {
+                  const lat = parseFloat(place.lat);
+                  const lon = parseFloat(place.lon);
+                  if (window._map && window._marker) {
+                    window._map.setView([lat, lon], 16);
+                    window._marker.setLatLng([lat, lon]);
+                  }
+                  let latInput = document.getElementById('lat');
+                  let lngInput = document.getElementById('lng');
+                  if (latInput) latInput.value = lat.toFixed(6);
+                  if (lngInput) lngInput.value = lon.toFixed(6);
+                  searchInput.value = place.display_name;
+                  suggestionsBox.style.display = 'none';
+                });
+                suggestionsBox.appendChild(item);
+              });
+              suggestionsBox.style.display = data.length ? 'block' : 'none';
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+            suggestionsBox.style.display = 'none';
+          }
+        });
+      }
+    });
+    
+  </script>
+
+
+</html>
